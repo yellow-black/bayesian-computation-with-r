@@ -1,0 +1,1093 @@
+---
+title: "Exercise"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+set.seed(29)
+```
+
+```{r library}
+library(LearnBayes)
+```
+
+## 2-1
+
+### 事前分布の設定
+
+```{r}
+p = seq(0, 1, by=0.125)
+prior = c(0.001, 0.001, 0.950, 0.008, 0.008, 0.008, 0.008, 0.008, 0.008)
+sum(prior)
+```
+
+### 尤度関数
+
+```{r}
+likelihood = function (p) p ^ 6 * (1 - p) ^ 4
+```
+
+### 事後分布
+
+```{r}
+posterior = c()
+for (i in 1:length(p)) {
+  posterior = c(posterior, likelihood(p[i]) * prior[i]) 
+}
+posterior = posterior / sum(posterior)
+round(cbind(p, prior, posterior), 3)
+```
+
+## 2-2
+
+### 事前分布
+
+```{r}
+midpt = seq(0.05, 0.95, by = 0.1)
+prior = rep(0.1, 10) # 無情報事前分布
+curve(histprior(x, midpt, prior), from = 0, to = 1)
+```
+
+### 事後分布
+
+```{r}
+p = seq(0, 1, length = 500)
+posterior = c()
+for (i in length(p)) {
+  min_idx = which.min(abs(midpt - p[i]))
+  posterior = c(posterior, dbeta(p, 10, 10) * prior[min_idx]) # コイン Head 10, Tail = 10 
+}
+posterior = posterior / sum(posterior)
+ps = sample(p, replace = TRUE, prob = posterior)
+hist(ps)
+```
+
+## 2-3
+
+### 事前分布 
+
+```{r}
+p = seq(0, 1, length=100)
+plot(p, dbeta(p, 1, 1), type ="l")
+```
+
+### 事後分布
+
+```{r}
+p = seq(0, 1, length=100)
+plot(p, dbeta(p, 23, 8), type ="l")
+```
+
+### (a)
+
+```{r}
+qbeta(c(0.5, 0.95), 23, 8)
+```
+
+### (b)
+
+```{r}
+q = seq(0, 1, length=100)
+plot(q, pbeta(q, 23, 8), type ="l")
+```
+
+```{r}
+1 - pbeta(0.6, 23, 8)
+```
+
+### (c)
+
+```{r}
+rbeta(1000, 23, 8)
+```
+
+### (d)
+
+さらに、10人いる場合の高校を卒業する人数 $X$ の予測分布を求める．
+
+$$
+p(x) = \int_{0}^{1} \binom{10}{x}p^{x}(1-p)^{10-x} Beta(p|23,8) dp
+$$
+
+$$
+\begin{align}
+  p(X=9) 
+  &= \int_{0}^{1} \binom{10}{9}p^{9}(1-p)^{10-9} Beta(p|23,8) dp \\
+  &= \int_{0}^{1} 10 \cdot p^{9}(1-p) Beta(p|23,8) dp \\
+  &= \frac{10}{B(23, 8)} \int_{0}^{1} p^{9}(1-p) p^{22} (1-p)^{7} dp \\
+  &= \frac{10}{B(23, 8)} \int_{0}^{1} p^{31}(1-p)^{8} dp \\
+  &= \frac{10}{B(23, 8)} \int_{0}^{1} p^{32 - 1}(1-p)^{9 - 1} dp \\
+  &= \frac{10}{B(23, 8)} B(32, 9) \\
+\end{align}
+$$
+
+```{r}
+10 * beta(32, 9) / beta(23, 8)
+```
+
+$$
+\begin{align}
+  p(X=10) 
+  &= \int_{0}^{1} \binom{10}{10}p^{10}(1-p)^{10-10} Beta(p|23,8) dp \\
+  &= \int_{0}^{1} p^{10} Beta(p|23,8) dp \\
+  &= \frac{1}{B(23, 8)} \int_{0}^{1} p^{10} p^{22} (1-p)^{7} dp \\
+  &= \frac{1}{B(23, 8)} \int_{0}^{1} p^{32}(1-p)^{7} dp \\
+  &= \frac{1}{B(23, 8)} \int_{0}^{1} p^{33 - 1}(1-p)^{8 - 1} dp \\
+  &= \frac{1}{B(23, 8)} B(33, 8) \\
+\end{align}
+$$
+
+```{r}
+beta(33, 8) / beta(23, 8)
+```
+
+サンプリングすると以下のようにできる．  
+よって、このときの $X = 9 \; or \; X = 10$ となる確率を求めれば良い.
+
+$$
+p \sim Beta(p|23, 8) \\
+x \sim Bin(x|10, p)
+$$
+
+```{r}
+p = rbeta(10000, 23, 8)
+x = rbinom(10000, 10, p)
+table(x) / 10000
+```
+
+理論値と近い値となっていることが確認できる．
+
+## 2-4
+
+### (a)
+
+```{r}
+p = seq(0.1, 0.5, by=0.1)
+p
+prior = c(0.50, 0.2, 0.2, 0.05, 0.05)
+mean = sum(p * prior)
+mean
+sd = sqrt(sum((p - mean)^2 * prior))
+sd
+```
+
+$Beta(p|3, 12)$ の場合、サンプリング近似を行う.
+
+```{r}
+sample = rbeta(10000, shape1 = 3, shape2 = 12)
+mean(sample)
+sd(sample)
+```
+
+### (b)
+
+通学者数 $Y$ に関して、以下の予測分布が計算できる.
+
+#### 離散事前分布
+
+$$
+p(y) = \sum_p \binom{12}{y} p^{y} (1-p)^{12-y} g(p)
+$$
+
+```{r}
+predict = c()
+for (y in 0:12) {
+  p_y = 0
+  for (i in 1:length(p)) {  
+    p_y = p_y + choose(12, y) * p[i]^y * (1 - p[i])^(12 - y) * prior[i]
+  }
+  predict = c(predict, p_y)
+}
+predict
+plot(0:12, predict, type = "l")
+```
+
+```{r}
+pdiscp(p, prior, 12, 0:12)
+plot(0:12, pdiscp(p, prior, 12, 0:12), type = "l")
+```
+
+#### ベータ分布
+
+$$
+\begin{align}
+  p(y) 
+  &= \int_0^1 \binom{12}{y} p^{y} (1-p)^{12-y} \frac{1}{B(3, 12)} p^{3 - 1} (1-p)^{12 - 1} dp \\
+  &= \binom{12}{y}  \frac{1}{B(3, 12)}  \int_0^1 p^{y + 2} (1-p)^{23-y} dp \\
+  &= \binom{12}{y}  \frac{1}{B(3, 12)}  B(y + 3, 24 - y) \\
+\end{align}
+$$
+
+```{r}
+predict = c()
+for (y in 0:12) {
+  p_y = choose(12, y) * beta(y + 3, 24 - y) / beta(3, 12)
+  predict = c(predict, p_y)
+}
+predict
+sum(predict)
+plot(0:12, predict, type = "l")
+```
+
+```{r}
+pbetap(c(3, 12), 12, 0:12)
+plot(0:12, pbetap(c(3, 12), 12, 0:12), type = "l")
+```
+
+## 2-5
+
+### (a)
+
+```{r}
+mu = seq(20, 70, by = 10)
+prior = c(0.1, 0.15, 0.25, 0.25, 0.15, 0.1)
+mu
+prior
+```
+
+### (b)
+
+```{r}
+y = c(38.6, 42.4, 57.5, 40.5, 51.7, 67.1, 33.4, 60.9, 64.1, 40.1, 40.7, 6.4)
+ybar = mean(y)
+ybar
+```
+
+### (c)
+
+```{r}
+likelihood = function (mu) exp(-1 * length(y) / (2 * 100) * (mu - ybar)^2)
+like = likelihood(mu)
+like
+```
+
+### (d)
+
+```{r}
+post = prior * like
+post = post / sum(post)
+post
+```
+
+### (e)
+
+```{r}
+dist = cbind(mu, post)
+dist
+discint(dist, 0.8)
+```
+
+## 2-6
+
+### (a)
+
+```{r}
+lambda = c(0.5, 1, 1.5, 2, 2.5, 3)
+prior = c(0.1, 0.2, 0.3, 0.2, 0.15, 0.05)
+likelihood = function (lambda) exp(-6 * lambda) * (6 * lambda)^12
+post = prior * likelihood(lambda)
+post = post / sum(post)
+cbind(lambda, prior, round(post, 2))
+```
+
+### (b)
+
+$$
+p(y|\lambda) = \exp{(-\lambda)}\frac{\lambda^y}{y!}
+$$
+
+7 日間故障が起きない確率は、$p(y=0)^7$
+
+$$
+p(y=0|\lambda)^7 = \exp{(-\lambda)}^7 = \exp{(-7\lambda)}
+$$
+
+よって、予測確率は
+
+$$
+p(y=0) = \sum_{\lambda} p(y=0|\lambda) p(\lambda)
+$$
+
+```{r}
+predict = 0
+for (i in 1:length(lambda)) {
+  predict = predict + exp(-7 * lambda[i]) * post[i]
+}
+predict
+```
+
+## 3-1
+
+```{r}
+y = c(0, 10, 9, 8 ,11, 3, 3, 8, 8 ,11)
+```
+
+### (a)
+
+```{r}
+grid = seq(-2, 12, by = 0.1)
+grid
+```
+
+### (b)
+
+```{r}
+post = c()
+for (i in 1:length(grid)) {
+  post = c(post, prod(1 / (1 + (y - grid[i])^2)))
+}
+post = post / sum(post)
+post
+```
+
+### (c)
+
+```{r}
+plot(grid, post, type = "l")
+```
+
+### (d)
+
+```{r}
+ps = sample(grid, replace = TRUE, prob = post)
+hist(ps)
+```
+
+```{r}
+mean(ps)
+sd(ps)
+```
+
+## 3-2
+
+### (a)
+
+$$
+g(\lambda|data) \propto \lambda^{-n-1} \exp{(-\frac{s}{\lambda})}
+$$
+
+$$
+\theta = \frac{1}{\lambda} \\
+\begin{align}
+  g(\theta|data) 
+  &\propto \theta^{n+1} \exp{(-s \theta)} \cdot |\frac{d\lambda}{d\theta}| \\
+  &= \theta^{n+1} \exp{(-s \theta)} \cdot |\frac{d}{d\theta}\theta^{-1}| \\
+  &= \theta^{n+1} \exp{(-s \theta)} \cdot |-1 \cdot \theta^{-2}| \\
+  &= \theta^{n-1} \exp{(-s \theta)} \\
+\end{align}
+$$
+
+### (b)
+
+1つの電球が切れるまでの時間を $X$ とすると、$X \sim Exp(x|\beta)$ と考えられる．
+
+```{r}
+x = c(751, 594, 1213, 1126, 819)
+n = length(x)
+s = sum(x)
+theta = rgamma(1000, n, s)
+hist(theta)
+```
+
+### (c)
+
+```{r}
+lambda = 1 / theta
+hist(lambda)
+```
+
+### (d)
+
+```{r}
+length(lambda[lambda > 1000]) / 1000
+```
+
+## 3-3
+
+$$
+\begin{align}
+  g(N|y) 
+  &\propto \frac{1}{N^n}, \quad y_{(n)} \le N \le B \\
+\end{align}
+$$
+
+ここで、$N$ は最大値の分布であることから、$y_1, \ldots, y_n$ を観測した際には、初期の候補 $1 \le N \le B$ から上記へと分布が縮小する．(観測値の最大値以上の値になる)
+
+### (a)
+
+```{r}
+n = 5
+y = c(43, 24, 100, 35, 85)
+B = 200
+grid = seq(max(y), B, by = 1)
+post = 1 / grid^n
+post = post / sum(post)
+plot(grid, post)
+```
+
+### (b)
+
+```{r}
+N = sample(grid, size = 1000, replace = TRUE, prob = post)
+```
+
+```{r}
+mean(N)
+sd(N)
+```
+
+### (c)
+
+```{r}
+length(N[N > 150]) / 1000
+```
+
+## 3-4
+
+### (a)
+
+#### P1
+
+```{r}
+m = 1000
+p1 = rbeta(m, 100, 100)
+hist(p1)
+length(p1[0.44 < p1 & p1 < 0.56]) / m
+```
+
+#### P2
+
+```{r}
+q = function (p) 0.9 * dbeta(p, 500, 500) + 0.1 * dbeta(p, 1, 1)
+p = seq(0.4, 0.6, length = 1000)
+plot(p, q(p))
+```
+
+```{r}
+m = 10000 # 1000 では分布の形を見るのには少ない
+p2_sampling = function () {
+  x = sample(c(0, 1), 1, prob = c(0.1, 0.9))
+  if (x == 1) {
+    return(rbeta(1, 500, 500))
+  } else {
+    return(rbeta(1, 1, 1))
+  }
+}
+p2 = replicate(m, p2_sampling())
+hist(p2, xlim = c(0.4, 0.6), breaks=seq(0, 1, 0.005))
+length(p2[0.44 < p2 & p2 < 0.56]) / m
+```
+
+### (b)
+
+尤度は以下のようになる.
+
+$$
+L(p) = \binom{100}{45} p^{45} (1-p)^{55}
+$$
+
+#### P1
+
+事後分布は、事前分布が $Beta(100, 100)$ で、表が 45 回出ているので、$Beta(145, 155)$ となる．
+
+$$
+\begin{align}
+  p(p|data) 
+  &\propto L(p) g(p) \\
+  &= \binom{100}{45} p^{45} (1-p)^{55} Beta(p|100, 100) \\
+  &\propto p^{45} (1-p)^{55} p^{100-1} (1-p)^{100-1} \\
+  &= p^{45 + 100 - 1} (1-p)^{55 + 100 - 1} \\
+\end{align}
+$$
+
+```{r}
+p1 = rbeta(1000, 145, 155)
+hist(p1)
+quantile(p1, c(0.05, 0.95))
+```
+
+#### P2
+
+事後分布は、以下のようになる．
+
+$$
+\begin{align}
+  p(p|data) 
+  &\propto L(p) g(p) \\
+  &= \binom{100}{45} p^{45} (1-p)^{55} \{ 0.9 Beta(p|500, 500) + 0.1 Beta(p|1,1) \} \\
+  &= 0.9 \cdot \binom{100}{45} p^{45} (1-p)^{55} Beta(p|500, 500) + 0.1 \cdot \binom{100}{45} p^{45} (1-p)^{55} Beta(p|1,1) \\
+  &= 0.9 \cdot \binom{100}{45} p^{45} (1-p)^{55} \frac{1}{B(500, 500)} p^{500 - 1} (1-p)^{500 - 1} + 0.1 \cdot \binom{100}{45} p^{45} (1-p)^{55} \frac{1}{B(1, 1)} p^{1 - 1} (1-p)^{1 - 1} \\
+  &\propto 0.9 \cdot  \frac{1}{B(500, 500)} p^{500 + 45 - 1} (1-p)^{500 + 55 - 1} + 0.1 \cdot \frac{1}{B(1, 1)} p^{1 + 45 - 1} (1-p)^{1 + 55 - 1} \\
+  &= 0.9 \cdot \frac{1}{B(500, 500)} p^{500 + 45 - 1} (1-p)^{500 + 55 - 1} + 0.1 \cdot p^{1 + 45 - 1} (1-p)^{1 + 55 - 1} \\
+  &= 0.9 \cdot \frac{B(545, 555)}{B(500, 500)} \frac{1}{B(545, 555)} p^{500 + 45 - 1} (1-p)^{500 + 55 - 1} + 0.1 \cdot B(46, 56) \frac{1}{B(46, 56)} p^{1 + 45 - 1} (1-p)^{1 + 55 - 1} \\
+  &= 0.9 \cdot \frac{B(545, 555)}{B(500, 500)} Beta(p|545, 555) + 0.1 \cdot B(46, 56) Beta(p|46, 56) \\
+\end{align}
+$$
+
+$\int Beta(p|545, 555) dp = 1, \int Beta(p|46, 56) dp = 1$ より、混合比率に関しては、混合比率を $\gamma$ とすると、以下の式になる．
+
+$$
+\gamma : 1 - \gamma = 0.9 \cdot \frac{B(545, 555)}{B(500, 500)} : 0.1 \cdot B(46, 56) \\
+\begin{align}
+  (1 - \gamma) \cdot (0.9 \cdot \frac{B(545, 555)}{B(500, 500)}) &= \gamma \cdot 0.1 \cdot B(46, 56) \\
+  (0.9 \cdot \frac{B(545, 555)}{B(500, 500)}) - \gamma \cdot (0.9 \cdot \frac{B(545, 555)}{B(500, 500)}) &= \gamma \cdot 0.1 \cdot B(46, 56) \\
+  \{ (0.9 \cdot \frac{B(545, 555)}{B(500, 500)}) + 0.1 \cdot B(46, 56) \} \gamma &= (0.9 \cdot \frac{B(545, 555)}{B(500, 500)})
+\end{align} 
+\\
+\gamma = \frac{(0.9 \cdot \frac{B(545, 555)}{B(500, 500)})}{(0.9 \cdot \frac{B(545, 555)}{B(500, 500)}) + 0.1 \cdot B(46, 56)}
+$$
+
+よって、各項の係数は以下のようになる．
+
+```{r}
+tmp = exp(lbeta(545, 555) - lbeta(500, 500)) # overflow するので、log で計算
+gamma = (0.9 * tmp) / (0.9 * tmp + 0.1 * beta(46, 56))
+gamma
+1 - gamma
+```
+
+```{r}
+m = 10000 # 1000 では分布の形を見るのには少ない
+p2_sampling = function () {
+  x = sample(c(0, 1), 1, prob = c(0.0222, 0.9778))
+  if (x == 1) {
+    return(rbeta(1, 545, 555))
+  } else {
+    return(rbeta(1, 46, 56))
+  }
+}
+p2 = replicate(m, p2_sampling())
+hist(p2, xlim = c(0.4, 0.6), breaks=seq(0, 1, 0.005))
+quantile(p2, c(0.05, 0.95))
+```
+
+LearnBayesを用いると以下になる．
+
+```{r}
+probs = c(0.9, 0.1)
+beta.par1 = c(500, 500)
+beta.par2 = c(1, 1)
+betapar = rbind(beta.par1, beta.par2)
+data = c(45, 55)
+post = binomial.beta.mix(probs, betapar, data)
+post
+```
+
+### (c)
+
+#### P1
+
+```{r}
+p1 = rbeta(1000, 130, 170)
+hist(p1)
+quantile(p1, c(0.05, 0.95))
+```
+
+#### P2
+
+同様な計算から、
+
+$$
+\begin{align}
+  p(p|data) 
+  &\propto L(p) g(p) \\
+  &= 0.9 \cdot \frac{B(530, 570)}{B(500, 500)} f_B(p;530, 570) + 0.1 \cdot B(31, 71) f_B(p;31, 71) \\
+\end{align}
+$$
+
+混合比率に関しても同様に、
+
+$$
+\gamma = \frac{(0.9 \cdot \frac{B(530, 570)}{B(500, 500)})}{(0.9 \cdot \frac{B(530, 570)}{B(500, 500)}) + 0.1 \cdot B(31, 71)}
+$$
+
+よって、各項の係数は以下のようになる．
+
+```{r}
+tmp = exp(lbeta(530, 570) - lbeta(500, 500)) # overflow するので、log で計算
+gamma = (0.9 * tmp) / (0.9 * tmp + 0.1 * beta(31, 71))
+gamma
+1 - gamma
+```
+
+```{r}
+m = 10000 # 1000 では分布の形を見るのには少ない
+p2_sampling = function () {
+  x = sample(c(0, 1), 1, prob = c(0.0399, 0.9601))
+  if (x == 1) {
+    return(rbeta(1, 530, 570))
+  } else {
+    return(rbeta(1, 31, 71))
+  }
+}
+p2 = replicate(m, p2_sampling())
+hist(p2, xlim = c(0.4, 0.6), breaks=seq(0, 1, 0.005))
+quantile(p2, c(0.05, 0.95))
+```
+
+LearnBayesを用いると以下になる．
+
+```{r}
+probs = c(0.9, 0.1)
+beta.par1 = c(500, 500)
+beta.par2 = c(1, 1)
+betapar = rbind(beta.par1, beta.par2)
+data = c(30, 70)
+post = binomial.beta.mix(probs, betapar, data)
+post
+```
+
+### (d)
+
+|      |  45  |  30  |
+| ---- | ---- | ---- |
+|  P1  | 0.4348357 ~ 0.5342714 | 0.3852962 ~ 0.4818855 |
+|  P2  | 0.4683059 ~ 0.5202097 | 0.4458550 ~ 0.5062934 |
+
+上記の表から、P2の方が頑健性が高い．
+
+## 3-5
+
+### (a)
+
+$$
+p(X = 8) = \binom{20}{8} p^{8} (1-p)^{20 - 8}
+$$
+
+```{r}
+dbinom(8, 20, 0.2)
+choose(20, 8) * (0.2) ^ 8 * (1 - 0.2) ^ (20 - 8)
+```
+
+### (b)
+
+$$
+g(p) = 0.5I(p = 0.2) + 0.5I(p \ne 0.2) Beta(p|1,4)
+$$
+
+```{r}
+q = function (p) {
+  if (p == 0.2) {
+    return(0.5)
+  } else {
+    return(0.5 * dbeta(p, 1, 4))
+  }
+}
+p = seq(0, 1, by = 0.01)
+plot(p, lapply(p, q), type = "l")
+```
+
+$$
+\begin{align}
+  p(p|data) 
+  &\propto L(p) g(p) \\
+  &= \binom{20}{8} p^{8} (1-p)^{20 - 8} \{ 0.5I(p = 0.2) + 0.5I(p \ne 0.2) Beta(p|1,4) \} \\
+  &= \binom{20}{8} p^{8} (1-p)^{20 - 8} \frac{1}{2} I(p = 0.2) + \binom{20}{8} p^{8} (1-p)^{20 - 8} \frac{1}{2} I(p \ne 0.2) Beta(p|1,4) \\
+  &\propto p^{8} (1-p)^{20 - 8} I(p = 0.2) + p^{8} (1-p)^{20 - 8} I(p \ne 0.2) Beta(p|1,4) \\
+  &= p^{8} (1-p)^{20 - 8} I(p = 0.2) + p^{8} (1-p)^{20 - 8} I(p \ne 0.2) \frac{1}{B(1, 4)} p^{1 - 1} (1 - p)^{4 - 1} \\
+  &= p^{8} (1-p)^{20 - 8} I(p = 0.2) + I(p \ne 0.2) \frac{1}{B(1, 4)} p^{9 - 1} (1 - p)^{16 - 1} \\
+  &= p^{8} (1-p)^{20 - 8} I(p = 0.2) + I(p \ne 0.2) \frac{B(9 , 16)}{B(1, 4)} Beta(p|9 ,16) \\
+\end{align}
+$$
+
+$\int Beta(p|9 ,16) = 1$ と $p^{8} (1-p)^{20 - 8} I(p = 0.2) = (0.2)^8 (1 - 0.2)^{12}$ より、係数に関しては以下のようになる．
+
+$$
+\gamma : 1 - \gamma = (0.2)^8 (1 - 0.2)^{12} : \frac{B(9 , 16)}{B(1, 4)} \\
+\begin{align}
+  (1 - \gamma) \cdot (0.2)^8 (1 - 0.2)^{12} &= \gamma \cdot \frac{B(9 , 16)}{B(1, 4)} \\
+  (0.2)^8 (1 - 0.2)^{12} - \gamma \cdot (0.2)^8 (1 - 0.2)^{12} &= \gamma \cdot \frac{B(9 , 16)}{B(1, 4)} \\
+\end{align} 
+\\
+\gamma = \frac{(0.2)^8(1 - 0.2)^{12}}{(0.2)^8 (1 - 0.2)^{12} + \frac{B(9 , 16)}{B(1, 4)}}
+$$
+
+```{r}
+gamma = (0.2 ^ 8 * (1 - 0.2)^12) / (0.2 ^ 8 * (1 - 0.2)^12 + beta(9, 16)/beta(1, 4))
+gamma
+1 - gamma
+```
+
+よって、今回の結果だと、$p = 0.2$ のときは、0.3410 となる．
+一方で、(a) の結果は、0.02216088 である．
+
+```{r}
+q = function (p) {
+  if (p == 0.2) {
+    return(0.341)
+  } else {
+    return(0.659 * dbeta(p, 9, 16))
+  }
+}
+p = seq(0, 1, by = 0.01)
+plot(p, lapply(p, q), type = "l")
+```
+
+LearnBayes を用いると、以下になる．
+
+```{r}
+pbetat(0.2, .5, c(1, 4), c(8, 12))
+```
+
+### (c)
+
+#### (1)
+
+$$
+g(p) = 0.5I(p = 0.2) + 0.5I(p \ne 0.2) Beta(p|0.5,2)
+$$
+
+```{r}
+q = function (p) {
+  if (p == 0.2) {
+    return(0.5)
+  } else {
+    return(0.5 * dbeta(p, 0.5, 2))
+  }
+}
+p = seq(0, 1, by = 0.01)
+plot(p, lapply(p, q), type = "l")
+```
+
+$$
+\begin{align}
+  p(p|data) 
+  &\propto L(p) g(p) \\
+  &= p^{8} (1-p)^{20 - 8} I(p = 0.2) + I(p \ne 0.2) \frac{B(8.5, 14)}{B(0.5, 2)} Beta(p|8.5, 14) \\
+\end{align}
+$$
+
+$\int Beta(p|8.5, 14) = 1$ と $p^{8} (1-p)^{20 - 8} I(p = 0.2) = (0.2)^8 (1 - 0.2)^{12}$ より、係数に関しては以下のようになる．
+
+$$
+\gamma : 1 - \gamma = (0.2)^8 (1 - 0.2)^{12} : \frac{B(8.5, 14)}{B(0.5, 2)} \\
+\gamma = \frac{(0.2)^8(1 - 0.2)^{12}}{(0.2)^8 (1 - 0.2)^{12} + \frac{B(8.5, 14)}{B(0.5, 2)}}
+$$
+
+```{r}
+gamma = (0.2 ^ 8 * (1 - 0.2)^12) / (0.2 ^ 8 * (1 - 0.2)^12 + beta(8.5, 14)/beta(0.5, 2))
+gamma
+1 - gamma
+```
+
+```{r}
+pbetat(0.2, .5, c(0.5, 2), c(8, 12))
+```
+
+#### (2)
+
+$$
+g(p) = 0.5I(p = 0.2) + 0.5I(p \ne 0.2) Beta(p|2, 8)
+$$
+
+```{r}
+q = function (p) {
+  if (p == 0.2) {
+    return(0.5)
+  } else {
+    return(0.5 * dbeta(p, 2, 8))
+  }
+}
+p = seq(0, 1, by = 0.01)
+plot(p, lapply(p, q), type = "l")
+```
+
+$$
+\begin{align}
+  p(p|data) 
+  &\propto L(p) g(p) \\
+  &= p^{8} (1-p)^{20 - 8} I(p = 0.2) + I(p \ne 0.2) \frac{B(10, 20)}{B(2, 8)} Beta(p|10, 20) \\
+\end{align}
+$$
+
+$\int Beta(p|8.5, 14) = 1$ と $p^{8} (1-p)^{20 - 8} I(p = 0.2) = (0.2)^8 (1 - 0.2)^{12}$ より、係数に関しては以下のようになる．
+
+$$
+\gamma : 1 - \gamma = (0.2)^8 (1 - 0.2)^{12} : \frac{B(10, 20)}{B(2, 8)} \\
+\gamma = \frac{(0.2)^8(1 - 0.2)^{12}}{(0.2)^8 (1 - 0.2)^{12} + \frac{B(10, 20)}{B(2, 8)}}
+$$
+
+```{r}
+gamma = (0.2 ^ 8 * (1 - 0.2)^12) / (0.2 ^ 8 * (1 - 0.2)^12 + beta(10, 20)/beta(2, 8))
+gamma
+1 - gamma
+```
+
+```{r}
+pbetat(0.2, .5, c(2, 8), c(8, 12))
+```
+
+#### (3)
+
+
+$$
+g(p) = 0.5I(p = 0.2) + 0.5I(p \ne 0.2) Beta(p|8, 32)
+$$
+
+```{r}
+q = function (p) {
+  if (p == 0.2) {
+    return(0.5)
+  } else {
+    return(0.5 * dbeta(p, 8, 32))
+  }
+}
+p = seq(0, 1, by = 0.01)
+plot(p, lapply(p, q), type = "l")
+```
+
+$$
+\begin{align}
+  p(p|data) 
+  &\propto L(p) g(p) \\
+  &= p^{8} (1-p)^{20 - 8} I(p = 0.2) + I(p \ne 0.2) \frac{B(16, 44)}{B(8, 32)} Beta(p|16, 44) \\
+\end{align}
+$$
+
+$\int Beta(p|16, 44) = 1$ と $p^{8} (1-p)^{20 - 8} I(p = 0.2) = (0.2)^8 (1 - 0.2)^{12}$ より、係数に関しては以下のようになる．
+
+$$
+\gamma : 1 - \gamma = (0.2)^8 (1 - 0.2)^{12} : \frac{B(16, 44)}{B(8, 32)} \\
+\gamma = \frac{(0.2)^8(1 - 0.2)^{12}}{(0.2)^8 (1 - 0.2)^{12} + \frac{B(16, 44)}{B(8, 32)}}
+$$
+
+```{r}
+gamma = (0.2 ^ 8 * (1 - 0.2)^12) / (0.2 ^ 8 * (1 - 0.2)^12 + beta(16, 44)/beta(8, 32))
+gamma
+1 - gamma
+```
+
+```{r}
+pbetat(0.2, .5, c(8, 32), c(8, 12))
+```
+
+### (d)
+
+20回中8回当てる確率は 0.3 程度と考えられるので、ESP があるとは言えない．
+
+## 3-6
+
+速度平均 $\mu$、標準偏差 $\sigma = 10$ で正規分布であるので、70 マイルで追い越す確率は $P(\mu < 70) = \Phi(70, \mu, 10)$ である．よって、尤度は以下のように表せる.
+
+$$
+L(\mu) \propto \Phi(70, \mu, 10)^s (1 - \Phi(70, \mu, 10))^f
+$$
+
+### (a)
+
+事前分布は一様分布($f(x) = C \quad (-\infty < x < \infty)$)であるとすると、
+
+$$
+\begin{align}
+  p(\mu|data) 
+  &\propto L(\mu) q(\mu) \\
+  &= C \cdot \Phi(70, \mu, 10) (1 - \Phi(70, \mu, 10))^{17} \\
+  &\propto \Phi(70, \mu, 10) (1 - \Phi(70, \mu, 10))^{17}
+\end{align}
+$$
+
+```{r}
+# グリッド近似を用いる
+mu = seq(0, 200, by = 0.1) # 速度は 0 以上であるので、加えて、最大値は 200 とした．
+p = function (mu) {
+  pnorm(70, mu, 10) * (1 - pnorm(70, mu, 10))^17
+}
+plot(mu, p(mu) / sum(p(mu)), type = "l")
+```
+
+### (b)
+
+グリッド近似した際の、各グリッドの値を $\mu_i$、グリッド数を $N$ とすると、事後平均は以下のように表せる.
+
+$$
+Mean = \sum_{i=1}^N \mu_i \cdot p(\mu_i)
+$$
+
+```{r}
+# グリッド近似を用いる
+mu = seq(0, 200, by = 0.1) # 速度は 0 以上であるので、加えて、最大値は 200 とした．
+p = function (mu) {
+  pnorm(70, mu, 10) * (1 - pnorm(70, mu, 10))^17
+}
+post = p(mu) / sum(p(mu))
+sum(mu * post) # 事後平均
+```
+
+### (c)
+
+$P(\mu > 80)$ を求めればよいので、以下のようになる．
+
+```{r}
+mu = seq(0, 150, by = 0.1) # 速度は 0 以上であるので、加えて、最大値は 200 とした．
+p = function (mu) {
+  pnorm(70, mu, 10) * (1 - pnorm(70, mu, 10))^17
+}
+post = p(mu) / sum(p(mu))
+sum(cbind(mu, post)[mu > 80, 2])
+```
+
+$P(\mu > 80) = 1 - P(\mu \le 80) = 1 - \int_{-\infty}^{80} p(\mu) d\mu$ の数値積分は以下のようになる．
+
+```{r}
+p = function (mu) {
+  pnorm(70, mu, 10) * (1 - pnorm(70, mu, 10))^17
+}
+z = integrate(p, 0, 150)$value # 正規化定数
+int = integrate(p, -Inf, 80)
+1 - int$value / z
+```
+
+80 マイル近傍の事後分布は以下のようになる.
+
+```{r}
+mu = seq(0, 200, by = 0.1)
+p = function (mu) {
+  pnorm(70, mu, 10) * (1 - pnorm(70, mu, 10))^17
+}
+post = p(mu) / sum(p(mu))
+plot(mu, post, xlim = c(70, 110), type = "l")
+```
+
+## 3-7
+
+### (a)
+
+$$
+g(\lambda) = 0.5 \cdot gamma(\lambda|1.5, 1000) + 0.5 \cdot gamma(\lambda|7, 1000)
+$$
+
+ガンマ分布は以下で定義する．
+
+$$
+gamma(\lambda|\alpha, \beta) = \frac{\beta^{\alpha}}{\Gamma(\alpha)} \lambda^{\alpha - 1} \exp{(-\beta\lambda)} \quad (\lambda > 0)
+$$
+
+```{r}
+lambda = seq(0, 1, by = 0.001)
+g = function (lambda) {
+  0.5 * dgamma(lambda, shape = 1.5, rate = 1000) + 0.5 * dgamma(lambda, shape = 7, rate = 1000)
+}
+plot(lambda, g(lambda), xlim = c(0, 0.1), type = "l")
+```
+
+### (b)
+
+死亡数 $y$ は、暴露数 $e$ と死亡率 $\lambda$ としたとき、平均 $e\lambda$ のポアソン分布に従うと考えられる．
+
+$$
+p(y) = Po(e\lambda) = \frac{(e\lambda)^{y}}{y!} \exp{(-e\lambda)}
+$$
+
+よって、$y = 4, e = 1767$ の時の、尤度は以下の用に表せる．
+
+$$
+L(\lambda) = \frac{(1767 \lambda)^{4}}{4!} \exp{(-1767\lambda)}
+$$
+
+この時、$\lambda$ の事後分布は以下のようになる．
+
+$$
+\begin{align}
+  p(\lambda|data) 
+  &\propto L(\lambda) g(\lambda) \\
+  &= \frac{(1767 \lambda)^{4}}{4!} \exp{(-1767\lambda)} \{ 0.5 \cdot gamma(\lambda|1.5, 1000) + 0.5 \cdot gamma(\lambda|7, 1000) \} \\
+  &\propto \lambda^{4} \exp{(-1767\lambda)} \{gamma(\lambda|1.5, 1000) + gamma(\lambda|7, 1000) \} \\
+  &= \lambda^{4} \exp{(-1767\lambda)} \{ \frac{1000^{1.5}}{\Gamma(1.5)} \lambda^{1.5 - 1} \exp{(-1000\lambda)} + \frac{1000^{7}}{\Gamma(7)} \lambda^{7 - 1} \exp{(-1000\lambda)} \} \\
+  &= \frac{1000^{1.5}}{\Gamma(1.5)} \lambda^{1.5 + 4 - 1} \exp{(-2767\lambda)} + \frac{1000^{7}}{\Gamma(7)} \lambda^{7 + 4 - 1} \exp{(-2767\lambda)} \\
+  &= \frac{1000^{1.5}}{\Gamma(1.5)} \frac{\Gamma(5.5)}{2767^{5.5}} gamma(\lambda|5.5, 2767) + \frac{1000^{7}}{\Gamma(7)} \frac{\Gamma(11)}{2767^{11}} gamma(\lambda|11, 2767) \\
+\end{align}
+$$
+
+ここで、混合比率を $\pi$ とすると、
+
+$$
+\pi : 1 - \pi = \frac{1000^{1.5}}{\Gamma(1.5)} \frac{\Gamma(5.5)}{2767^{5.5}} : \frac{1000^{7}}{\Gamma(7)} \frac{\Gamma(11)}{2767^{11}} \\
+a = \frac{1000^{1.5}}{\Gamma(1.5)} \frac{\Gamma(5.5)}{2767^{5.5}}, b = \frac{1000^{7}}{\Gamma(7)} \frac{\Gamma(11)}{2767^{11}} \\
+\pi = \frac{a}{a + b}
+$$
+
+```{r}
+a = (1000 ^ 1.5 * gamma(5.5)) / (gamma(1.5) * 2767 ^ 5.5)
+b = (1000 ^ 7 * gamma(11)) / (gamma(7) * 2767 ^ 11)
+pi = a / (a + b)
+pi
+1 - pi
+```
+
+LearnBayes の場合は以下のようになる．
+
+```{r}
+probs = c(0.5, 0.5)
+gamma.par1 = c(1.5, 1000)
+gamma.par2 = c(7, 1000)
+gammapar = rbind(gamma.par1, gamma.par2)
+data = data.frame(t = 1767, y = 4)
+post = poisson.gamma.mix(probs, gammapar, data)
+post
+```
+
+### (c)
+
+```{r}
+lambda = seq(0, 1, by = 0.001)
+g = function (lambda) {
+  0.5 * dgamma(lambda, shape = 1.5, rate = 1000) + 0.5 * dgamma(lambda, shape = 7, rate = 1000)
+}
+post = function (lambda) {
+  pi * dgamma(lambda, shape = 5.5, rate = 2767) + (1 - pi) * dgamma(lambda, shape = 11, rate = 2767)
+}
+plot(lambda, g(lambda), xlim = c(0, 0.02), ylim = c(0, 500), ylab = "", type = "l", lty = 2)
+par(new=T)  
+plot(lambda, post(lambda), xlim = c(0, 0.02), ylim = c(0, 500), ylab = "", type = "l")
+```
+
+### (d)
+
+$P(\lambda > 0.005) = 1 - P(\lambda \le 0.005) = 1 - \int_0^{0.005} p(\lambda) d\lambda$ である．
+
+```{r}
+# 数値積分
+p = function (lambda) {
+  return(pi * dgamma(lambda, shape = 5.5, rate = 2767) + (1 - pi) * dgamma(lambda, shape = 11, rate = 2767))
+}
+int = integrate(p, lower = 0, upper = 0.005)
+1 - int$value
+```
+
+```{r}
+# サンプリング近似
+post_sample = function () {
+  x = sample(c(0, 1), 1, prob = c(1 - pi, pi))
+  if (x == 1) {
+    return(rgamma(1, shape = 5.5, rate = 2767))
+  } else {
+    return(rgamma(1, shape = 11, rate = 2767))    
+  }
+}
+sample = replicate(100000, post_sample())
+sum(sample > 0.005) / 100000
+```
+
+```{r}
+# グリッド近似
+lambda = seq(0, 1, by = 0.000001)
+p = function (lambda) {
+  pi * dgamma(lambda, shape = 5.5, rate = 2767) + (1 - pi) * dgamma(lambda, shape = 11, rate = 2767)
+}
+post = p(lambda) / sum(p(lambda))
+sum(cbind(lambda, post)[lambda > 0.005, 2])
+```
+
+### (e)
+
+混合確率は、$g_1(\lambda), g_2(\lambda)$ のそれぞれ 0.7597182、0.2402818 となっているので、このデータは $g_1(\lambda)$ に適合していると考えられる．
+
+## 3-8
+
+
+
+
