@@ -1,6 +1,9 @@
 ---
 title: "Exercise"
-output: html_document
+output:
+  pdf_document: 
+    latex_engine: xelatex
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -114,7 +117,7 @@ p(x) = \int_{0}^{1} \binom{10}{x}p^{x}(1-p)^{10-x} Beta(p|23,8) dp
 $$
 
 $$
-\begin{align}
+\begin{aligned}
   p(X=9) 
   &= \int_{0}^{1} \binom{10}{9}p^{9}(1-p)^{10-9} Beta(p|23,8) dp \\
   &= \int_{0}^{1} 10 \cdot p^{9}(1-p) Beta(p|23,8) dp \\
@@ -122,7 +125,7 @@ $$
   &= \frac{10}{B(23, 8)} \int_{0}^{1} p^{31}(1-p)^{8} dp \\
   &= \frac{10}{B(23, 8)} \int_{0}^{1} p^{32 - 1}(1-p)^{9 - 1} dp \\
   &= \frac{10}{B(23, 8)} B(32, 9) \\
-\end{align}
+\end{aligned}
 $$
 
 ```{r}
@@ -130,7 +133,7 @@ $$
 ```
 
 $$
-\begin{align}
+\begin{aligned}
   p(X=10) 
   &= \int_{0}^{1} \binom{10}{10}p^{10}(1-p)^{10-10} Beta(p|23,8) dp \\
   &= \int_{0}^{1} p^{10} Beta(p|23,8) dp \\
@@ -138,7 +141,7 @@ $$
   &= \frac{1}{B(23, 8)} \int_{0}^{1} p^{32}(1-p)^{7} dp \\
   &= \frac{1}{B(23, 8)} \int_{0}^{1} p^{33 - 1}(1-p)^{8 - 1} dp \\
   &= \frac{1}{B(23, 8)} B(33, 8) \\
-\end{align}
+\end{aligned}
 $$
 
 ```{r}
@@ -214,12 +217,12 @@ plot(0:12, pdiscp(p, prior, 12, 0:12), type = "l")
 #### ベータ分布
 
 $$
-\begin{align}
+\begin{aligned}
   p(y) 
   &= \int_0^1 \binom{12}{y} p^{y} (1-p)^{12-y} \frac{1}{B(3, 12)} p^{3 - 1} (1-p)^{12 - 1} dp \\
   &= \binom{12}{y}  \frac{1}{B(3, 12)}  \int_0^1 p^{y + 2} (1-p)^{23-y} dp \\
   &= \binom{12}{y}  \frac{1}{B(3, 12)}  B(y + 3, 24 - y) \\
-\end{align}
+\end{aligned}
 $$
 
 ```{r}
@@ -372,13 +375,13 @@ $$
 
 $$
 \theta = \frac{1}{\lambda} \\
-\begin{align}
+\begin{aligned}
   g(\theta|data) 
   &\propto \theta^{n+1} \exp{(-s \theta)} \cdot |\frac{d\lambda}{d\theta}| \\
   &= \theta^{n+1} \exp{(-s \theta)} \cdot |\frac{d}{d\theta}\theta^{-1}| \\
   &= \theta^{n+1} \exp{(-s \theta)} \cdot |-1 \cdot \theta^{-2}| \\
   &= \theta^{n-1} \exp{(-s \theta)} \\
-\end{align}
+\end{aligned}
 $$
 
 ### (b)
@@ -409,10 +412,10 @@ length(lambda[lambda > 1000]) / 1000
 ## 3-3
 
 $$
-\begin{align}
+\begin{aligned}
   g(N|y) 
   &\propto \frac{1}{N^n}, \quad y_{(n)} \le N \le B \\
-\end{align}
+\end{aligned}
 $$
 
 ここで、$N$ は最大値の分布であることから、$y_1, \ldots, y_n$ を観測した際には、初期の候補 $1 \le N \le B$ から上記へと分布が縮小する．(観測値の最大値以上の値になる)
@@ -495,13 +498,13 @@ $$
 事後分布は、事前分布が $Beta(100, 100)$ で、表が 45 回出ているので、$Beta(145, 155)$ となる．
 
 $$
-\begin{align}
+\begin{aligned}
   p(p|data) 
   &\propto L(p) g(p) \\
   &= \binom{100}{45} p^{45} (1-p)^{55} Beta(p|100, 100) \\
   &\propto p^{45} (1-p)^{55} p^{100-1} (1-p)^{100-1} \\
   &= p^{45 + 100 - 1} (1-p)^{55 + 100 - 1} \\
-\end{align}
+\end{aligned}
 $$
 
 ```{r}
@@ -515,7 +518,7 @@ quantile(p1, c(0.05, 0.95))
 事後分布は、以下のようになる．
 
 $$
-\begin{align}
+\begin{aligned}
   p(p|data) 
   &\propto L(p) g(p) \\
   &= \binom{100}{45} p^{45} (1-p)^{55} \{ 0.9 Beta(p|500, 500) + 0.1 Beta(p|1,1) \} \\
@@ -525,18 +528,18 @@ $$
   &= 0.9 \cdot \frac{1}{B(500, 500)} p^{500 + 45 - 1} (1-p)^{500 + 55 - 1} + 0.1 \cdot p^{1 + 45 - 1} (1-p)^{1 + 55 - 1} \\
   &= 0.9 \cdot \frac{B(545, 555)}{B(500, 500)} \frac{1}{B(545, 555)} p^{500 + 45 - 1} (1-p)^{500 + 55 - 1} + 0.1 \cdot B(46, 56) \frac{1}{B(46, 56)} p^{1 + 45 - 1} (1-p)^{1 + 55 - 1} \\
   &= 0.9 \cdot \frac{B(545, 555)}{B(500, 500)} Beta(p|545, 555) + 0.1 \cdot B(46, 56) Beta(p|46, 56) \\
-\end{align}
+\end{aligned}
 $$
 
 $\int Beta(p|545, 555) dp = 1, \int Beta(p|46, 56) dp = 1$ より、混合比率に関しては、混合比率を $\gamma$ とすると、以下の式になる．
 
 $$
 \gamma : 1 - \gamma = 0.9 \cdot \frac{B(545, 555)}{B(500, 500)} : 0.1 \cdot B(46, 56) \\
-\begin{align}
+\begin{aligned}
   (1 - \gamma) \cdot (0.9 \cdot \frac{B(545, 555)}{B(500, 500)}) &= \gamma \cdot 0.1 \cdot B(46, 56) \\
   (0.9 \cdot \frac{B(545, 555)}{B(500, 500)}) - \gamma \cdot (0.9 \cdot \frac{B(545, 555)}{B(500, 500)}) &= \gamma \cdot 0.1 \cdot B(46, 56) \\
   \{ (0.9 \cdot \frac{B(545, 555)}{B(500, 500)}) + 0.1 \cdot B(46, 56) \} \gamma &= (0.9 \cdot \frac{B(545, 555)}{B(500, 500)})
-\end{align} 
+\end{aligned} 
 \\
 \gamma = \frac{(0.9 \cdot \frac{B(545, 555)}{B(500, 500)})}{(0.9 \cdot \frac{B(545, 555)}{B(500, 500)}) + 0.1 \cdot B(46, 56)}
 $$
@@ -592,11 +595,11 @@ quantile(p1, c(0.05, 0.95))
 同様な計算から、
 
 $$
-\begin{align}
+\begin{aligned}
   p(p|data) 
   &\propto L(p) g(p) \\
   &= 0.9 \cdot \frac{B(530, 570)}{B(500, 500)} f_B(p;530, 570) + 0.1 \cdot B(31, 71) f_B(p;31, 71) \\
-\end{align}
+\end{aligned}
 $$
 
 混合比率に関しても同様に、
@@ -682,7 +685,7 @@ plot(p, lapply(p, q), type = "l")
 ```
 
 $$
-\begin{align}
+\begin{aligned}
   p(p|data) 
   &\propto L(p) g(p) \\
   &= \binom{20}{8} p^{8} (1-p)^{20 - 8} \{ 0.5I(p = 0.2) + 0.5I(p \ne 0.2) Beta(p|1,4) \} \\
@@ -691,17 +694,17 @@ $$
   &= p^{8} (1-p)^{20 - 8} I(p = 0.2) + p^{8} (1-p)^{20 - 8} I(p \ne 0.2) \frac{1}{B(1, 4)} p^{1 - 1} (1 - p)^{4 - 1} \\
   &= p^{8} (1-p)^{20 - 8} I(p = 0.2) + I(p \ne 0.2) \frac{1}{B(1, 4)} p^{9 - 1} (1 - p)^{16 - 1} \\
   &= p^{8} (1-p)^{20 - 8} I(p = 0.2) + I(p \ne 0.2) \frac{B(9 , 16)}{B(1, 4)} Beta(p|9 ,16) \\
-\end{align}
+\end{aligned}
 $$
 
 $\int Beta(p|9 ,16) = 1$ と $p^{8} (1-p)^{20 - 8} I(p = 0.2) = (0.2)^8 (1 - 0.2)^{12}$ より、係数に関しては以下のようになる．
 
 $$
 \gamma : 1 - \gamma = (0.2)^8 (1 - 0.2)^{12} : \frac{B(9 , 16)}{B(1, 4)} \\
-\begin{align}
+\begin{aligned}
   (1 - \gamma) \cdot (0.2)^8 (1 - 0.2)^{12} &= \gamma \cdot \frac{B(9 , 16)}{B(1, 4)} \\
   (0.2)^8 (1 - 0.2)^{12} - \gamma \cdot (0.2)^8 (1 - 0.2)^{12} &= \gamma \cdot \frac{B(9 , 16)}{B(1, 4)} \\
-\end{align} 
+\end{aligned} 
 \\
 \gamma = \frac{(0.2)^8(1 - 0.2)^{12}}{(0.2)^8 (1 - 0.2)^{12} + \frac{B(9 , 16)}{B(1, 4)}}
 $$
@@ -754,11 +757,11 @@ plot(p, lapply(p, q), type = "l")
 ```
 
 $$
-\begin{align}
+\begin{aligned}
   p(p|data) 
   &\propto L(p) g(p) \\
   &= p^{8} (1-p)^{20 - 8} I(p = 0.2) + I(p \ne 0.2) \frac{B(8.5, 14)}{B(0.5, 2)} Beta(p|8.5, 14) \\
-\end{align}
+\end{aligned}
 $$
 
 $\int Beta(p|8.5, 14) = 1$ と $p^{8} (1-p)^{20 - 8} I(p = 0.2) = (0.2)^8 (1 - 0.2)^{12}$ より、係数に関しては以下のようになる．
@@ -797,11 +800,11 @@ plot(p, lapply(p, q), type = "l")
 ```
 
 $$
-\begin{align}
+\begin{aligned}
   p(p|data) 
   &\propto L(p) g(p) \\
   &= p^{8} (1-p)^{20 - 8} I(p = 0.2) + I(p \ne 0.2) \frac{B(10, 20)}{B(2, 8)} Beta(p|10, 20) \\
-\end{align}
+\end{aligned}
 $$
 
 $\int Beta(p|8.5, 14) = 1$ と $p^{8} (1-p)^{20 - 8} I(p = 0.2) = (0.2)^8 (1 - 0.2)^{12}$ より、係数に関しては以下のようになる．
@@ -841,11 +844,11 @@ plot(p, lapply(p, q), type = "l")
 ```
 
 $$
-\begin{align}
+\begin{aligned}
   p(p|data) 
   &\propto L(p) g(p) \\
   &= p^{8} (1-p)^{20 - 8} I(p = 0.2) + I(p \ne 0.2) \frac{B(16, 44)}{B(8, 32)} Beta(p|16, 44) \\
-\end{align}
+\end{aligned}
 $$
 
 $\int Beta(p|16, 44) = 1$ と $p^{8} (1-p)^{20 - 8} I(p = 0.2) = (0.2)^8 (1 - 0.2)^{12}$ より、係数に関しては以下のようになる．
@@ -882,12 +885,12 @@ $$
 事前分布は一様分布($f(x) = C \quad (-\infty < x < \infty)$)であるとすると、
 
 $$
-\begin{align}
+\begin{aligned}
   p(\mu|data) 
   &\propto L(\mu) q(\mu) \\
   &= C \cdot \Phi(70, \mu, 10) (1 - \Phi(70, \mu, 10))^{17} \\
   &\propto \Phi(70, \mu, 10) (1 - \Phi(70, \mu, 10))^{17}
-\end{align}
+\end{aligned}
 $$
 
 ```{r}
@@ -991,7 +994,7 @@ $$
 この時、$\lambda$ の事後分布は以下のようになる．
 
 $$
-\begin{align}
+\begin{aligned}
   p(\lambda|data) 
   &\propto L(\lambda) g(\lambda) \\
   &= \frac{(1767 \lambda)^{4}}{4!} \exp{(-1767\lambda)} \{ 0.5 \cdot gamma(\lambda|1.5, 1000) + 0.5 \cdot gamma(\lambda|7, 1000) \} \\
@@ -999,7 +1002,7 @@ $$
   &= \lambda^{4} \exp{(-1767\lambda)} \{ \frac{1000^{1.5}}{\Gamma(1.5)} \lambda^{1.5 - 1} \exp{(-1000\lambda)} + \frac{1000^{7}}{\Gamma(7)} \lambda^{7 - 1} \exp{(-1000\lambda)} \} \\
   &= \frac{1000^{1.5}}{\Gamma(1.5)} \lambda^{1.5 + 4 - 1} \exp{(-2767\lambda)} + \frac{1000^{7}}{\Gamma(7)} \lambda^{7 + 4 - 1} \exp{(-2767\lambda)} \\
   &= \frac{1000^{1.5}}{\Gamma(1.5)} \frac{\Gamma(5.5)}{2767^{5.5}} gamma(\lambda|5.5, 2767) + \frac{1000^{7}}{\Gamma(7)} \frac{\Gamma(11)}{2767^{11}} gamma(\lambda|11, 2767) \\
-\end{align}
+\end{aligned}
 $$
 
 ここで、混合比率を $\pi$ とすると、
