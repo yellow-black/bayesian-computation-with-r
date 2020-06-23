@@ -3,7 +3,14 @@ title: "Bayesian Computation with R"
 author: "s-takano"
 ---
 
-## Exercise
+自分で解いた練習問題の解答をまとめていきます．
+
+## 練習問題の解答
 
 - [Chapter2](./chapter2.html)
 - [Chapter3](./chapter3.html)
+
+## Links
+
+- https://www.maruzen-publishing.co.jp/item/?book_no=294516
+- https://www.springer.com/gp/book/9780387922973
