@@ -1,0 +1,10 @@
+name: "Bayesian-Computation-With-R"
+output_dir: "docs"
+navbar:
+  title: "Bayesian-Computation-With-R"
+  left:
+    - text: "Home"
+      href: index.html
+    - text: "Exercise"
+      href: Exercise.html
+theme: cosmo
