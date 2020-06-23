@@ -1,8 +1,9 @@
 ---
-title: "Exercise"
+title: "Bayesian Computation with R"
 author: "s-takano"
 ---
 
-[Chapter2](./chapter2.html)
+## Exercise
 
-[Chapter3](./chapter3.html)
+- [Chapter2](./chapter2.html)
+- [Chapter3](./chapter3.html)
