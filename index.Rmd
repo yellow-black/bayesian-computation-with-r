@@ -3,6 +3,6 @@ title: "Exercise"
 author: "s-takano"
 ---
 
-[Chapter2](./chapter2.Rmd)
+[Chapter2](./chapter2.html)
 
-[Chapter3](./chapter3.Rmd)
+[Chapter3](./chapter3.html)

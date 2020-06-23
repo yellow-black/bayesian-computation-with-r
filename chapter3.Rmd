@@ -1,6 +1,6 @@
 ---
 title: "chapter3"
-output: html_document
+author: "s-takano"
 ---
 
 ```{r setup, include=FALSE}
