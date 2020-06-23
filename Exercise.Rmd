@@ -4,6 +4,9 @@ output:
   pdf_document: 
     latex_engine: xelatex
   html_document: default
+  documentclass: bxjsarticle
+  classoption: xelatex,ja=standard
+  geometry: no
 ---
 
 ```{r setup, include=FALSE}
@@ -1091,6 +1094,81 @@ sum(cbind(lambda, post)[lambda > 0.005, 2])
 
 ## 3-8
 
+$$
+f(y:\lambda) = Exp(y|\lambda) \\
+F(y;\lambda) = \int_{-\infty}^{y} f(y:\lambda) dy
+$$
+
+であるとする．
+
+平均 $\lambda$ の指数分布にしたがう電球 12個のテストする．4番目に短い寿命である $y_4 = 100$ であるので、1 ~ 3 番目までは 100時間までに切れる確率であるので、$F(100;\lambda)^3$ とできる． $y_4 = 100$ となる確率(密度)は $f(100;\lambda)$ である．
+8番目に短い寿命である $y_8 = 300$ であるので、5 ~ 7 番目までは 100 ~ 300時間までに切れる確率であるので、$(F(300;\lambda) - F(100;\lambda))^3$ とできる．$y_8 = 300$ となる確率(密度)は $f(300;\lambda)$ である．9 ~ 12 番目は 300 ~ 時間で切れる確率であるので、$(1 - F(300;\lambda))^4$ であるので、尤度関数は以下になる．
+
+$$
+L(\lambda) \propto F(100;\lambda)^3 f(100;\lambda) (F(300;\lambda) - F(100;\lambda))^3 f(100;\lambda) (1 - F(300;\lambda))^4
+$$
+
+### (a)
+
+事前分布は以下とする．
+
+$$
+p(\lambda) \propto \frac{1}{\lambda}
+$$
+
+事後分布は以下になる．
+
+$$
+\begin{aligned}
+  p(\lambda|data) 
+  &\propto L(\lambda) p(\lambda) \\
+  &= F(100;\lambda)^3 f(100;\lambda) (F(300;\lambda) - F(100;\lambda))^3 f(100;\lambda) (1 - F(300;\lambda))^4 \frac{1}{\lambda}
+\end{aligned}
+$$
+
+```{r}
+# グリッド近似を用いる
+lambda = seq(0.1, 1000, by = 0.1)
+p = function (lambda) {
+  likelihood = pexp(100, 1/lambda)^3 * dexp(100, 1/lambda) * (pexp(300, 1/lambda) - pexp(100, 1/lambda))^3 * dexp(300, 1/lambda) * (1 - pexp(300, 1/lambda))^4
+  return(likelihood / lambda)
+}
+post = p(lambda)
+post = post / sum(post)
+plot(lambda, post, type = "l")
+```
+
+### (b)
+
+```{r}
+# グリッド近似を用いる
+lambda = seq(0.1, 1000, by = 0.1)
+p = function (lambda) {
+  likelihood = pexp(100, 1/lambda)^3 * dexp(100, 1/lambda) * (pexp(300, 1/lambda) - pexp(100, 1/lambda))^3 * dexp(300, 1/lambda) * (1 - pexp(300, 1/lambda))^4
+  return(likelihood / lambda)
+}
+post = p(lambda)
+post = post / sum(post)
+mu = sum(lambda * post)
+mu
+sqrt(sum((lambda - mu)^2 * post))
+```
+
+### (c)
+
+```{r}
+# グリッド近似を用いる
+lambda = seq(0.1, 1000, by = 0.1)
+p = function (lambda) {
+  likelihood = pexp(100, 1/lambda)^3 * dexp(100, 1/lambda) * (pexp(300, 1/lambda) - pexp(100, 1/lambda))^3 * dexp(300, 1/lambda) * (1 - pexp(300, 1/lambda))^4
+  return(likelihood / lambda)
+}
+post = p(lambda)
+post = post / sum(post)
+sum(cbind(lambda, post)[300 < lambda & lambda < 500, 2])
+```
+
+## 4-1
 
 
 
