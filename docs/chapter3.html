@@ -9,10 +9,9 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
-<meta name="author" content="s-takano" />
 
 
-<title>Exercise</title>
+<title>chapter3</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -268,15 +267,12 @@ $(document).ready(function () {
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="index.html">Bayesian-Computation-With-R</a>
+      <a class="navbar-brand" href="index.html">Bayesian-Computation-With-R(Rで学ぶベイズ統計学入門)</a>
     </div>
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
   <a href="index.html">Home</a>
-</li>
-<li>
-  <a href="Exercise.html">Exercise</a>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
@@ -290,331 +286,18 @@ $(document).ready(function () {
 
 
 
-<h1 class="title toc-ignore">Exercise</h1>
-<h4 class="author">s-takano</h4>
+<h1 class="title toc-ignore">chapter3</h1>
 
 </div>
 
 
 <pre class="r"><code>set.seed(29)</code></pre>
 <pre class="r"><code>library(LearnBayes)</code></pre>
-<div id="section" class="section level2">
-<h2>2-1</h2>
-<div id="事前分布の設定" class="section level3">
-<h3>事前分布の設定</h3>
-<pre class="r"><code>p = seq(0, 1, by=0.125)
-prior = c(0.001, 0.001, 0.950, 0.008, 0.008, 0.008, 0.008, 0.008, 0.008)
-sum(prior)</code></pre>
-<pre><code>## [1] 1</code></pre>
-</div>
-<div id="尤度関数" class="section level3">
-<h3>尤度関数</h3>
-<pre class="r"><code>likelihood = function (p) p ^ 6 * (1 - p) ^ 4</code></pre>
-</div>
-<div id="事後分布" class="section level3">
-<h3>事後分布</h3>
-<pre class="r"><code>posterior = c()
-for (i in 1:length(p)) {
-  posterior = c(posterior, likelihood(p[i]) * prior[i]) 
-}
-posterior = posterior / sum(posterior)
-round(cbind(p, prior, posterior), 3)</code></pre>
-<pre><code>##           p prior posterior
-##  [1,] 0.000 0.001     0.000
-##  [2,] 0.125 0.001     0.000
-##  [3,] 0.250 0.950     0.730
-##  [4,] 0.375 0.008     0.034
-##  [5,] 0.500 0.008     0.078
-##  [6,] 0.625 0.008     0.094
-##  [7,] 0.750 0.008     0.055
-##  [8,] 0.875 0.008     0.009
-##  [9,] 1.000 0.008     0.000</code></pre>
-</div>
-</div>
-<div id="section-1" class="section level2">
-<h2>2-2</h2>
-<div id="事前分布" class="section level3">
-<h3>事前分布</h3>
-<pre class="r"><code>midpt = seq(0.05, 0.95, by = 0.1)
-prior = rep(0.1, 10) # 無情報事前分布
-curve(histprior(x, midpt, prior), from = 0, to = 1)</code></pre>
-<p><img src="Exercise_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
-</div>
-<div id="事後分布-1" class="section level3">
-<h3>事後分布</h3>
-<pre class="r"><code>p = seq(0, 1, length = 500)
-posterior = c()
-for (i in length(p)) {
-  min_idx = which.min(abs(midpt - p[i]))
-  posterior = c(posterior, dbeta(p, 10, 10) * prior[min_idx]) # コイン Head 10, Tail = 10 
-}
-posterior = posterior / sum(posterior)
-ps = sample(p, replace = TRUE, prob = posterior)
-hist(ps)</code></pre>
-<p><img src="Exercise_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
-</div>
-</div>
-<div id="section-2" class="section level2">
-<h2>2-3</h2>
-<div id="事前分布-1" class="section level3">
-<h3>事前分布</h3>
-<pre class="r"><code>p = seq(0, 1, length=100)
-plot(p, dbeta(p, 1, 1), type =&quot;l&quot;)</code></pre>
-<p><img src="Exercise_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
-</div>
-<div id="事後分布-2" class="section level3">
-<h3>事後分布</h3>
-<pre class="r"><code>p = seq(0, 1, length=100)
-plot(p, dbeta(p, 23, 8), type =&quot;l&quot;)</code></pre>
-<p><img src="Exercise_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<div id="section" class="section level3">
+<h3>3-1</h3>
+<pre class="r"><code>y = c(0, 10, 9, 8 ,11, 3, 3, 8, 8 ,11)</code></pre>
 </div>
 <div id="a" class="section level3">
-<h3>(a)</h3>
-<pre class="r"><code>qbeta(c(0.5, 0.95), 23, 8)</code></pre>
-<pre><code>## [1] 0.7471911 0.8598149</code></pre>
-</div>
-<div id="b" class="section level3">
-<h3>(b)</h3>
-<pre class="r"><code>q = seq(0, 1, length=100)
-plot(q, pbeta(q, 23, 8), type =&quot;l&quot;)</code></pre>
-<p><img src="Exercise_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
-<pre class="r"><code>1 - pbeta(0.6, 23, 8)</code></pre>
-<pre><code>## [1] 0.9564759</code></pre>
-</div>
-<div id="c" class="section level3">
-<h3>(c)</h3>
-<pre class="r"><code>sample = rbeta(1000, 23, 8)
-sample[1:100]</code></pre>
-<pre><code>##   [1] 0.8070411 0.8255705 0.8477878 0.8108964 0.5317507 0.6689845 0.7476998 0.5928586 0.8221321 0.6747017
-##  [11] 0.8718341 0.6920089 0.6583218 0.6658947 0.7164831 0.7388286 0.7370553 0.6340145 0.5931665 0.8259576
-##  [21] 0.8674522 0.6588919 0.7786812 0.8250223 0.7543352 0.7646318 0.8076675 0.7075955 0.5620429 0.6311084
-##  [31] 0.7760624 0.7828018 0.8001533 0.7533651 0.7204592 0.7126806 0.6963089 0.7200499 0.7241966 0.6954281
-##  [41] 0.7771320 0.7758104 0.7877369 0.6878208 0.6566363 0.7038708 0.7457192 0.7594498 0.7318217 0.7833370
-##  [51] 0.7323663 0.7595893 0.8384151 0.7640964 0.7508796 0.7798371 0.8113989 0.7495155 0.7004356 0.8477141
-##  [61] 0.7682620 0.8378440 0.8100615 0.7901226 0.7423015 0.7588627 0.8255460 0.7433915 0.7981177 0.6595531
-##  [71] 0.6546487 0.7899955 0.8291286 0.7201989 0.7269412 0.8071294 0.6084613 0.7088205 0.5755315 0.5836573
-##  [81] 0.8408905 0.6462143 0.7539278 0.7029940 0.6070669 0.8072564 0.6368789 0.7252253 0.6867064 0.7091260
-##  [91] 0.7579631 0.7055456 0.7030036 0.7053452 0.6349164 0.5357193 0.7662252 0.8386757 0.6946933 0.7423767</code></pre>
-</div>
-<div id="d" class="section level3">
-<h3>(d)</h3>
-<p>さらに、10人いる場合の高校を卒業する人数 <span class="math inline">\(X\)</span> の予測分布を求める．</p>
-<p><span class="math display">\[
-p(x) = \int_{0}^{1} \binom{10}{x}p^{x}(1-p)^{10-x} Beta(p|23,8) dp
-\]</span></p>
-<p><span class="math display">\[
-\begin{aligned}
-  p(X=9) 
-  &amp;= \int_{0}^{1} \binom{10}{9}p^{9}(1-p)^{10-9} Beta(p|23,8) dp \\
-  &amp;= \int_{0}^{1} 10 \cdot p^{9}(1-p) Beta(p|23,8) dp \\
-  &amp;= \frac{10}{B(23, 8)} \int_{0}^{1} p^{9}(1-p) p^{22} (1-p)^{7} dp \\
-  &amp;= \frac{10}{B(23, 8)} \int_{0}^{1} p^{31}(1-p)^{8} dp \\
-  &amp;= \frac{10}{B(23, 8)} \int_{0}^{1} p^{32 - 1}(1-p)^{9 - 1} dp \\
-  &amp;= \frac{10}{B(23, 8)} B(32, 9) \\
-\end{aligned}
-\]</span></p>
-<pre class="r"><code>10 * beta(32, 9) / beta(23, 8)</code></pre>
-<pre><code>## [1] 0.1902656</code></pre>
-<p><span class="math display">\[
-\begin{aligned}
-  p(X=10) 
-  &amp;= \int_{0}^{1} \binom{10}{10}p^{10}(1-p)^{10-10} Beta(p|23,8) dp \\
-  &amp;= \int_{0}^{1} p^{10} Beta(p|23,8) dp \\
-  &amp;= \frac{1}{B(23, 8)} \int_{0}^{1} p^{10} p^{22} (1-p)^{7} dp \\
-  &amp;= \frac{1}{B(23, 8)} \int_{0}^{1} p^{32}(1-p)^{7} dp \\
-  &amp;= \frac{1}{B(23, 8)} \int_{0}^{1} p^{33 - 1}(1-p)^{8 - 1} dp \\
-  &amp;= \frac{1}{B(23, 8)} B(33, 8) \\
-\end{aligned}
-\]</span></p>
-<pre class="r"><code>beta(33, 8) / beta(23, 8)</code></pre>
-<pre><code>## [1] 0.07610622</code></pre>
-<p>サンプリングすると以下のようにできる．<br />
-よって、このときの <span class="math inline">\(X = 9 \; or \; X = 10\)</span> となる確率を求めれば良い.</p>
-<p><span class="math display">\[
-p \sim Beta(p|23, 8) \\
-x \sim Bin(x|10, p)
-\]</span></p>
-<pre class="r"><code>p = rbeta(10000, 23, 8)
-x = rbinom(10000, 10, p)
-table(x) / 10000</code></pre>
-<pre><code>## x
-##      1      2      3      4      5      6      7      8      9     10 
-## 0.0002 0.0024 0.0094 0.0322 0.0787 0.1480 0.2250 0.2493 0.1818 0.0730</code></pre>
-<p>理論値と近い値となっていることが確認できる．</p>
-</div>
-</div>
-<div id="section-3" class="section level2">
-<h2>2-4</h2>
-<div id="a-1" class="section level3">
-<h3>(a)</h3>
-<pre class="r"><code>p = seq(0.1, 0.5, by=0.1)
-p</code></pre>
-<pre><code>## [1] 0.1 0.2 0.3 0.4 0.5</code></pre>
-<pre class="r"><code>prior = c(0.50, 0.2, 0.2, 0.05, 0.05)
-mean = sum(p * prior)
-mean</code></pre>
-<pre><code>## [1] 0.195</code></pre>
-<pre class="r"><code>sd = sqrt(sum((p - mean)^2 * prior))
-sd</code></pre>
-<pre><code>## [1] 0.1160819</code></pre>
-<p><span class="math inline">\(Beta(p|3, 12)\)</span> の場合、サンプリング近似を行う.</p>
-<pre class="r"><code>sample = rbeta(10000, shape1 = 3, shape2 = 12)
-mean(sample)</code></pre>
-<pre><code>## [1] 0.1993212</code></pre>
-<pre class="r"><code>sd(sample)</code></pre>
-<pre><code>## [1] 0.1002495</code></pre>
-</div>
-<div id="b-1" class="section level3">
-<h3>(b)</h3>
-<p>通学者数 <span class="math inline">\(Y\)</span> に関して、以下の予測分布が計算できる.</p>
-<div id="離散事前分布" class="section level4">
-<h4>離散事前分布</h4>
-<p><span class="math display">\[
-p(y) = \sum_p \binom{12}{y} p^{y} (1-p)^{12-y} g(p)
-\]</span></p>
-<pre class="r"><code>predict = c()
-for (y in 0:12) {
-  p_y = 0
-  for (i in 1:length(p)) {  
-    p_y = p_y + choose(12, y) * p[i]^y * (1 - p[i])^(12 - y) * prior[i]
-  }
-  predict = c(predict, p_y)
-}
-predict</code></pre>
-<pre><code>##  [1] 0.1578479672 0.2447719936 0.2093137913 0.1475812240 0.1001416403 0.0652427436 0.0393037888 0.0212231429
-##  [9] 0.0098095892 0.0036170714 0.0009692955 0.0001645993 0.0000131530</code></pre>
-<pre class="r"><code>plot(0:12, predict, type = &quot;l&quot;)</code></pre>
-<p><img src="Exercise_files/figure-html/unnamed-chunk-18-1.png" width="672" /></p>
-<pre class="r"><code>pdiscp(p, prior, 12, 0:12)</code></pre>
-<pre><code>##  [1] 0.1578479672 0.2447719936 0.2093137913 0.1475812240 0.1001416403 0.0652427436 0.0393037888 0.0212231429
-##  [9] 0.0098095892 0.0036170714 0.0009692955 0.0001645993 0.0000131530</code></pre>
-<pre class="r"><code>plot(0:12, pdiscp(p, prior, 12, 0:12), type = &quot;l&quot;)</code></pre>
-<p><img src="Exercise_files/figure-html/unnamed-chunk-19-1.png" width="672" /></p>
-</div>
-<div id="ベータ分布" class="section level4">
-<h4>ベータ分布</h4>
-<p><span class="math display">\[
-\begin{aligned}
-  p(y) 
-  &amp;= \int_0^1 \binom{12}{y} p^{y} (1-p)^{12-y} \frac{1}{B(3, 12)} p^{3 - 1} (1-p)^{12 - 1} dp \\
-  &amp;= \binom{12}{y}  \frac{1}{B(3, 12)}  \int_0^1 p^{y + 2} (1-p)^{23-y} dp \\
-  &amp;= \binom{12}{y}  \frac{1}{B(3, 12)}  B(y + 3, 24 - y) \\
-\end{aligned}
-\]</span></p>
-<pre class="r"><code>predict = c()
-for (y in 0:12) {
-  p_y = choose(12, y) * beta(y + 3, 24 - y) / beta(3, 12)
-  predict = c(predict, p_y)
-}
-predict</code></pre>
-<pre><code>##  [1] 1.400000e-01 2.191304e-01 2.191304e-01 1.739130e-01 1.173913e-01 6.919908e-02 3.588101e-02 1.628214e-02
-##  [9] 6.360210e-03 2.072957e-03 5.330462e-04 9.691749e-05 9.422533e-06</code></pre>
-<pre class="r"><code>sum(predict)</code></pre>
-<pre><code>## [1] 1</code></pre>
-<pre class="r"><code>plot(0:12, predict, type = &quot;l&quot;)</code></pre>
-<p><img src="Exercise_files/figure-html/unnamed-chunk-20-1.png" width="672" /></p>
-<pre class="r"><code>pbetap(c(3, 12), 12, 0:12)</code></pre>
-<pre><code>##  [1] 1.400000e-01 2.191304e-01 2.191304e-01 1.739130e-01 1.173913e-01 6.919908e-02 3.588101e-02 1.628214e-02
-##  [9] 6.360210e-03 2.072957e-03 5.330462e-04 9.691749e-05 9.422533e-06</code></pre>
-<pre class="r"><code>plot(0:12, pbetap(c(3, 12), 12, 0:12), type = &quot;l&quot;)</code></pre>
-<p><img src="Exercise_files/figure-html/unnamed-chunk-21-1.png" width="672" /></p>
-</div>
-</div>
-</div>
-<div id="section-4" class="section level2">
-<h2>2-5</h2>
-<div id="a-2" class="section level3">
-<h3>(a)</h3>
-<pre class="r"><code>mu = seq(20, 70, by = 10)
-prior = c(0.1, 0.15, 0.25, 0.25, 0.15, 0.1)
-mu</code></pre>
-<pre><code>## [1] 20 30 40 50 60 70</code></pre>
-<pre class="r"><code>prior</code></pre>
-<pre><code>## [1] 0.10 0.15 0.25 0.25 0.15 0.10</code></pre>
-</div>
-<div id="b-2" class="section level3">
-<h3>(b)</h3>
-<pre class="r"><code>y = c(38.6, 42.4, 57.5, 40.5, 51.7, 67.1, 33.4, 60.9, 64.1, 40.1, 40.7, 6.4)
-ybar = mean(y)
-ybar</code></pre>
-<pre><code>## [1] 45.28333</code></pre>
-</div>
-<div id="c-1" class="section level3">
-<h3>(c)</h3>
-<pre class="r"><code>likelihood = function (mu) exp(-1 * length(y) / (2 * 100) * (mu - ybar)^2)
-like = likelihood(mu)
-like</code></pre>
-<pre><code>## [1] 2.201480e-17 8.192991e-07 1.873425e-01 2.632064e-01 2.272076e-06 1.205079e-16</code></pre>
-</div>
-<div id="d-1" class="section level3">
-<h3>(d)</h3>
-<pre class="r"><code>post = prior * like
-post = post / sum(post)
-post</code></pre>
-<pre><code>## [1] 1.954479e-17 1.091063e-06 4.158078e-01 5.841881e-01 3.025731e-06 1.069871e-16</code></pre>
-</div>
-<div id="e" class="section level3">
-<h3>(e)</h3>
-<pre class="r"><code>dist = cbind(mu, post)
-dist</code></pre>
-<pre><code>##      mu         post
-## [1,] 20 1.954479e-17
-## [2,] 30 1.091063e-06
-## [3,] 40 4.158078e-01
-## [4,] 50 5.841881e-01
-## [5,] 60 3.025731e-06
-## [6,] 70 1.069871e-16</code></pre>
-<pre class="r"><code>discint(dist, 0.8)</code></pre>
-<pre><code>## $prob
-## [1] 0.9999959
-## 
-## $set
-## [1] 40 50</code></pre>
-</div>
-</div>
-<div id="section-5" class="section level2">
-<h2>2-6</h2>
-<div id="a-3" class="section level3">
-<h3>(a)</h3>
-<pre class="r"><code>lambda = c(0.5, 1, 1.5, 2, 2.5, 3)
-prior = c(0.1, 0.2, 0.3, 0.2, 0.15, 0.05)
-likelihood = function (lambda) exp(-6 * lambda) * (6 * lambda)^12
-post = prior * likelihood(lambda)
-post = post / sum(post)
-cbind(lambda, prior, round(post, 2))</code></pre>
-<pre><code>##      lambda prior     
-## [1,]    0.5  0.10 0.00
-## [2,]    1.0  0.20 0.04
-## [3,]    1.5  0.30 0.36
-## [4,]    2.0  0.20 0.37
-## [5,]    2.5  0.15 0.20
-## [6,]    3.0  0.05 0.03</code></pre>
-</div>
-<div id="b-3" class="section level3">
-<h3>(b)</h3>
-<p><span class="math display">\[
-p(y|\lambda) = \exp{(-\lambda)}\frac{\lambda^y}{y!}
-\]</span></p>
-<p>7 日間故障が起きない確率は、<span class="math inline">\(p(y=0)^7\)</span></p>
-<p><span class="math display">\[
-p(y=0|\lambda)^7 = \exp{(-\lambda)}^7 = \exp{(-7\lambda)}
-\]</span></p>
-<p>よって、予測確率は</p>
-<p><span class="math display">\[
-p(y=0) = \sum_{\lambda} p(y=0|\lambda) p(\lambda)
-\]</span></p>
-<pre class="r"><code>predict = 0
-for (i in 1:length(lambda)) {
-  predict = predict + exp(-7 * lambda[i]) * post[i]
-}
-predict</code></pre>
-<pre><code>## [1] 4.640932e-05</code></pre>
-</div>
-</div>
-<div id="section-6" class="section level2">
-<h2>3-1</h2>
-<pre class="r"><code>y = c(0, 10, 9, 8 ,11, 3, 3, 8, 8 ,11)</code></pre>
-<div id="a-4" class="section level3">
 <h3>(a)</h3>
 <pre class="r"><code>grid = seq(-2, 12, by = 0.1)
 grid</code></pre>
@@ -626,7 +309,7 @@ grid</code></pre>
 ## [106]  8.5  8.6  8.7  8.8  8.9  9.0  9.1  9.2  9.3  9.4  9.5  9.6  9.7  9.8  9.9 10.0 10.1 10.2 10.3 10.4 10.5
 ## [127] 10.6 10.7 10.8 10.9 11.0 11.1 11.2 11.3 11.4 11.5 11.6 11.7 11.8 11.9 12.0</code></pre>
 </div>
-<div id="b-4" class="section level3">
+<div id="b" class="section level3">
 <h3>(b)</h3>
 <pre class="r"><code>post = c()
 for (i in 1:length(grid)) {
@@ -653,25 +336,24 @@ post</code></pre>
 ## [129] 8.581987e-04 5.871043e-04 3.891602e-04 2.498625e-04 1.556626e-04 9.443623e-05 5.606765e-05 3.275997e-05
 ## [137] 1.894430e-05 1.089840e-05 6.264988e-06 3.611696e-06 2.093835e-06</code></pre>
 </div>
-<div id="c-2" class="section level3">
+<div id="c" class="section level3">
 <h3>(c)</h3>
 <pre class="r"><code>plot(grid, post, type = &quot;l&quot;)</code></pre>
-<p><img src="Exercise_files/figure-html/unnamed-chunk-32-1.png" width="672" /></p>
+<p><img src="chapter3_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
 </div>
-<div id="d-2" class="section level3">
+<div id="d" class="section level3">
 <h3>(d)</h3>
 <pre class="r"><code>ps = sample(grid, replace = TRUE, prob = post)
 hist(ps)</code></pre>
-<p><img src="Exercise_files/figure-html/unnamed-chunk-33-1.png" width="672" /></p>
+<p><img src="chapter3_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
 <pre class="r"><code>mean(ps)</code></pre>
-<pre><code>## [1] 8.588652</code></pre>
+<pre><code>## [1] 8.587234</code></pre>
 <pre class="r"><code>sd(ps)</code></pre>
-<pre><code>## [1] 0.6105141</code></pre>
+<pre><code>## [1] 0.6006962</code></pre>
 </div>
-</div>
-<div id="section-7" class="section level2">
+<div id="section-1" class="section level2">
 <h2>3-2</h2>
-<div id="a-5" class="section level3">
+<div id="a-1" class="section level3">
 <h3>(a)</h3>
 <p><span class="math display">\[
 g(\lambda|data) \propto \lambda^{-n-1} \exp{(-\frac{s}{\lambda})}
@@ -687,7 +369,7 @@ g(\lambda|data) \propto \lambda^{-n-1} \exp{(-\frac{s}{\lambda})}
 \end{aligned}
 \]</span></p>
 </div>
-<div id="b-5" class="section level3">
+<div id="b-1" class="section level3">
 <h3>(b)</h3>
 <p>1つの電球が切れるまでの時間を <span class="math inline">\(X\)</span> とすると、<span class="math inline">\(X \sim Exp(x|\beta)\)</span> と考えられる．</p>
 <pre class="r"><code>x = c(751, 594, 1213, 1126, 819)
@@ -695,21 +377,21 @@ n = length(x)
 s = sum(x)
 theta = rgamma(1000, n, s)
 hist(theta)</code></pre>
-<p><img src="Exercise_files/figure-html/unnamed-chunk-35-1.png" width="672" /></p>
+<p><img src="chapter3_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
 </div>
-<div id="c-3" class="section level3">
+<div id="c-1" class="section level3">
 <h3>(c)</h3>
 <pre class="r"><code>lambda = 1 / theta
 hist(lambda)</code></pre>
-<p><img src="Exercise_files/figure-html/unnamed-chunk-36-1.png" width="672" /></p>
+<p><img src="chapter3_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
 </div>
-<div id="d-3" class="section level3">
+<div id="d-1" class="section level3">
 <h3>(d)</h3>
 <pre class="r"><code>length(lambda[lambda &gt; 1000]) / 1000</code></pre>
-<pre><code>## [1] 0.471</code></pre>
+<pre><code>## [1] 0.466</code></pre>
 </div>
 </div>
-<div id="section-8" class="section level2">
+<div id="section-2" class="section level2">
 <h2>3-3</h2>
 <p><span class="math display">\[
 \begin{aligned}
@@ -718,7 +400,7 @@ hist(lambda)</code></pre>
 \end{aligned}
 \]</span></p>
 <p>ここで、<span class="math inline">\(N\)</span> は最大値の分布であることから、<span class="math inline">\(y_1, \ldots, y_n\)</span> を観測した際には、初期の候補 <span class="math inline">\(1 \le N \le B\)</span> から上記へと分布が縮小する．(観測値の最大値以上の値になる)</p>
-<div id="a-6" class="section level3">
+<div id="a-2" class="section level3">
 <h3>(a)</h3>
 <pre class="r"><code>n = 5
 y = c(43, 24, 100, 35, 85)
@@ -727,41 +409,41 @@ grid = seq(max(y), B, by = 1)
 post = 1 / grid^n
 post = post / sum(post)
 plot(grid, post)</code></pre>
-<p><img src="Exercise_files/figure-html/unnamed-chunk-38-1.png" width="672" /></p>
+<p><img src="chapter3_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
 </div>
-<div id="b-6" class="section level3">
+<div id="b-2" class="section level3">
 <h3>(b)</h3>
 <pre class="r"><code>N = sample(grid, size = 1000, replace = TRUE, prob = post)</code></pre>
 <pre class="r"><code>mean(N)</code></pre>
-<pre><code>## [1] 125.043</code></pre>
+<pre><code>## [1] 124.022</code></pre>
 <pre class="r"><code>sd(N)</code></pre>
-<pre><code>## [1] 23.26539</code></pre>
+<pre><code>## [1] 23.36072</code></pre>
 </div>
-<div id="c-4" class="section level3">
+<div id="c-2" class="section level3">
 <h3>(c)</h3>
 <pre class="r"><code>length(N[N &gt; 150]) / 1000</code></pre>
-<pre><code>## [1] 0.158</code></pre>
+<pre><code>## [1] 0.145</code></pre>
 </div>
 </div>
-<div id="section-9" class="section level2">
+<div id="section-3" class="section level2">
 <h2>3-4</h2>
-<div id="a-7" class="section level3">
+<div id="a-3" class="section level3">
 <h3>(a)</h3>
 <div id="p1" class="section level4">
 <h4>P1</h4>
 <pre class="r"><code>m = 1000
 p1 = rbeta(m, 100, 100)
 hist(p1)</code></pre>
-<p><img src="Exercise_files/figure-html/unnamed-chunk-42-1.png" width="672" /></p>
+<p><img src="chapter3_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
 <pre class="r"><code>length(p1[0.44 &lt; p1 &amp; p1 &lt; 0.56]) / m</code></pre>
-<pre><code>## [1] 0.914</code></pre>
+<pre><code>## [1] 0.897</code></pre>
 </div>
 <div id="p2" class="section level4">
 <h4>P2</h4>
 <pre class="r"><code>q = function (p) 0.9 * dbeta(p, 500, 500) + 0.1 * dbeta(p, 1, 1)
 p = seq(0.4, 0.6, length = 1000)
 plot(p, q(p))</code></pre>
-<p><img src="Exercise_files/figure-html/unnamed-chunk-43-1.png" width="672" /></p>
+<p><img src="chapter3_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
 <pre class="r"><code>m = 10000 # 1000 では分布の形を見るのには少ない
 p2_sampling = function () {
   x = sample(c(0, 1), 1, prob = c(0.1, 0.9))
@@ -773,12 +455,12 @@ p2_sampling = function () {
 }
 p2 = replicate(m, p2_sampling())
 hist(p2, xlim = c(0.4, 0.6), breaks=seq(0, 1, 0.005))</code></pre>
-<p><img src="Exercise_files/figure-html/unnamed-chunk-44-1.png" width="672" /></p>
+<p><img src="chapter3_files/figure-html/unnamed-chunk-17-1.png" width="672" /></p>
 <pre class="r"><code>length(p2[0.44 &lt; p2 &amp; p2 &lt; 0.56]) / m</code></pre>
-<pre><code>## [1] 0.9121</code></pre>
+<pre><code>## [1] 0.9118</code></pre>
 </div>
 </div>
-<div id="b-7" class="section level3">
+<div id="b-3" class="section level3">
 <h3>(b)</h3>
 <p>尤度は以下のようになる.</p>
 <p><span class="math display">\[
@@ -798,10 +480,10 @@ L(p) = \binom{100}{45} p^{45} (1-p)^{55}
 \]</span></p>
 <pre class="r"><code>p1 = rbeta(1000, 145, 155)
 hist(p1)</code></pre>
-<p><img src="Exercise_files/figure-html/unnamed-chunk-45-1.png" width="672" /></p>
+<p><img src="chapter3_files/figure-html/unnamed-chunk-18-1.png" width="672" /></p>
 <pre class="r"><code>quantile(p1, c(0.05, 0.95))</code></pre>
 <pre><code>##        5%       95% 
-## 0.4348357 0.5342714</code></pre>
+## 0.4398596 0.5315874</code></pre>
 </div>
 <div id="p2-1" class="section level4">
 <h4>P2</h4>
@@ -851,10 +533,10 @@ p2_sampling = function () {
 }
 p2 = replicate(m, p2_sampling())
 hist(p2, xlim = c(0.4, 0.6), breaks=seq(0, 1, 0.005))</code></pre>
-<p><img src="Exercise_files/figure-html/unnamed-chunk-47-1.png" width="672" /></p>
+<p><img src="chapter3_files/figure-html/unnamed-chunk-20-1.png" width="672" /></p>
 <pre class="r"><code>quantile(p2, c(0.05, 0.95))</code></pre>
 <pre><code>##        5%       95% 
-## 0.4683059 0.5202097</code></pre>
+## 0.4686523 0.5202615</code></pre>
 <p>LearnBayesを用いると以下になる．</p>
 <pre class="r"><code>probs = c(0.9, 0.1)
 beta.par1 = c(500, 500)
@@ -873,16 +555,16 @@ post</code></pre>
 ## beta.par2   46   56</code></pre>
 </div>
 </div>
-<div id="c-5" class="section level3">
+<div id="c-3" class="section level3">
 <h3>(c)</h3>
 <div id="p1-2" class="section level4">
 <h4>P1</h4>
 <pre class="r"><code>p1 = rbeta(1000, 130, 170)
 hist(p1)</code></pre>
-<p><img src="Exercise_files/figure-html/unnamed-chunk-49-1.png" width="672" /></p>
+<p><img src="chapter3_files/figure-html/unnamed-chunk-22-1.png" width="672" /></p>
 <pre class="r"><code>quantile(p1, c(0.05, 0.95))</code></pre>
 <pre><code>##        5%       95% 
-## 0.3852962 0.4818855</code></pre>
+## 0.3889137 0.4806054</code></pre>
 </div>
 <div id="p2-2" class="section level4">
 <h4>P2</h4>
@@ -916,10 +598,10 @@ p2_sampling = function () {
 }
 p2 = replicate(m, p2_sampling())
 hist(p2, xlim = c(0.4, 0.6), breaks=seq(0, 1, 0.005))</code></pre>
-<p><img src="Exercise_files/figure-html/unnamed-chunk-51-1.png" width="672" /></p>
+<p><img src="chapter3_files/figure-html/unnamed-chunk-24-1.png" width="672" /></p>
 <pre class="r"><code>quantile(p2, c(0.05, 0.95))</code></pre>
 <pre><code>##        5%       95% 
-## 0.4458550 0.5062934</code></pre>
+## 0.4473191 0.5065909</code></pre>
 <p>LearnBayesを用いると以下になる．</p>
 <pre class="r"><code>probs = c(0.9, 0.1)
 beta.par1 = c(500, 500)
@@ -938,7 +620,7 @@ post</code></pre>
 ## beta.par2   31   71</code></pre>
 </div>
 </div>
-<div id="d-4" class="section level3">
+<div id="d-2" class="section level3">
 <h3>(d)</h3>
 <table>
 <thead>
@@ -964,9 +646,9 @@ post</code></pre>
 <p>上記の表から、P2の方が頑健性が高い．</p>
 </div>
 </div>
-<div id="section-10" class="section level2">
+<div id="section-4" class="section level2">
 <h2>3-5</h2>
-<div id="a-8" class="section level3">
+<div id="a-4" class="section level3">
 <h3>(a)</h3>
 <p><span class="math display">\[
 p(X = 8) = \binom{20}{8} p^{8} (1-p)^{20 - 8}
@@ -976,7 +658,7 @@ p(X = 8) = \binom{20}{8} p^{8} (1-p)^{20 - 8}
 <pre class="r"><code>choose(20, 8) * (0.2) ^ 8 * (1 - 0.2) ^ (20 - 8)</code></pre>
 <pre><code>## [1] 0.02216088</code></pre>
 </div>
-<div id="b-8" class="section level3">
+<div id="b-4" class="section level3">
 <h3>(b)</h3>
 <p><span class="math display">\[
 g(p) = 0.5I(p = 0.2) + 0.5I(p \ne 0.2) Beta(p|1,4)
@@ -990,7 +672,7 @@ g(p) = 0.5I(p = 0.2) + 0.5I(p \ne 0.2) Beta(p|1,4)
 }
 p = seq(0, 1, by = 0.01)
 plot(p, lapply(p, q), type = &quot;l&quot;)</code></pre>
-<p><img src="Exercise_files/figure-html/unnamed-chunk-54-1.png" width="672" /></p>
+<p><img src="chapter3_files/figure-html/unnamed-chunk-27-1.png" width="672" /></p>
 <p><span class="math display">\[
 \begin{aligned}
   p(p|data) 
@@ -1031,7 +713,7 @@ gamma</code></pre>
 }
 p = seq(0, 1, by = 0.01)
 plot(p, lapply(p, q), type = &quot;l&quot;)</code></pre>
-<p><img src="Exercise_files/figure-html/unnamed-chunk-56-1.png" width="672" /></p>
+<p><img src="chapter3_files/figure-html/unnamed-chunk-29-1.png" width="672" /></p>
 <p>LearnBayes を用いると、以下になる．</p>
 <pre class="r"><code>pbetat(0.2, .5, c(1, 4), c(8, 12))</code></pre>
 <pre><code>## $bf
@@ -1040,9 +722,9 @@ plot(p, lapply(p, q), type = &quot;l&quot;)</code></pre>
 ## $post
 ## [1] 0.3410395</code></pre>
 </div>
-<div id="c-6" class="section level3">
+<div id="c-4" class="section level3">
 <h3>(c)</h3>
-<div id="section-11" class="section level4">
+<div id="section-5" class="section level4">
 <h4>(1)</h4>
 <p><span class="math display">\[
 g(p) = 0.5I(p = 0.2) + 0.5I(p \ne 0.2) Beta(p|0.5,2)
@@ -1056,7 +738,7 @@ g(p) = 0.5I(p = 0.2) + 0.5I(p \ne 0.2) Beta(p|0.5,2)
 }
 p = seq(0, 1, by = 0.01)
 plot(p, lapply(p, q), type = &quot;l&quot;)</code></pre>
-<p><img src="Exercise_files/figure-html/unnamed-chunk-58-1.png" width="672" /></p>
+<p><img src="chapter3_files/figure-html/unnamed-chunk-31-1.png" width="672" /></p>
 <p><span class="math display">\[
 \begin{aligned}
   p(p|data) 
@@ -1083,7 +765,7 @@ gamma</code></pre>
 ## $post
 ## [1] 0.3900752</code></pre>
 </div>
-<div id="section-12" class="section level4">
+<div id="section-6" class="section level4">
 <h4>(2)</h4>
 <p><span class="math display">\[
 g(p) = 0.5I(p = 0.2) + 0.5I(p \ne 0.2) Beta(p|2, 8)
@@ -1097,7 +779,7 @@ g(p) = 0.5I(p = 0.2) + 0.5I(p \ne 0.2) Beta(p|2, 8)
 }
 p = seq(0, 1, by = 0.01)
 plot(p, lapply(p, q), type = &quot;l&quot;)</code></pre>
-<p><img src="Exercise_files/figure-html/unnamed-chunk-61-1.png" width="672" /></p>
+<p><img src="chapter3_files/figure-html/unnamed-chunk-34-1.png" width="672" /></p>
 <p><span class="math display">\[
 \begin{aligned}
   p(p|data) 
@@ -1122,7 +804,7 @@ gamma</code></pre>
 ## $post
 ## [1] 0.328591</code></pre>
 </div>
-<div id="section-13" class="section level4">
+<div id="section-7" class="section level4">
 <h4>(3)</h4>
 <p><span class="math display">\[
 g(p) = 0.5I(p = 0.2) + 0.5I(p \ne 0.2) Beta(p|8, 32)
@@ -1136,7 +818,7 @@ g(p) = 0.5I(p = 0.2) + 0.5I(p \ne 0.2) Beta(p|8, 32)
 }
 p = seq(0, 1, by = 0.01)
 plot(p, lapply(p, q), type = &quot;l&quot;)</code></pre>
-<p><img src="Exercise_files/figure-html/unnamed-chunk-64-1.png" width="672" /></p>
+<p><img src="chapter3_files/figure-html/unnamed-chunk-37-1.png" width="672" /></p>
 <p><span class="math display">\[
 \begin{aligned}
   p(p|data) 
@@ -1164,18 +846,18 @@ gamma</code></pre>
 ## [1] 0.3855337</code></pre>
 </div>
 </div>
-<div id="d-5" class="section level3">
+<div id="d-3" class="section level3">
 <h3>(d)</h3>
 <p>20回中8回当てる確率は 0.3 程度と考えられるので、ESP があるとは言えない．</p>
 </div>
 </div>
-<div id="section-14" class="section level2">
+<div id="section-8" class="section level2">
 <h2>3-6</h2>
 <p>速度平均 <span class="math inline">\(\mu\)</span>、標準偏差 <span class="math inline">\(\sigma = 10\)</span> で正規分布であるので、70 マイルで追い越す確率は <span class="math inline">\(P(\mu &lt; 70) = \Phi(70, \mu, 10)\)</span> である．よって、尤度は以下のように表せる.</p>
 <p><span class="math display">\[
 L(\mu) \propto \Phi(70, \mu, 10)^s (1 - \Phi(70, \mu, 10))^f
 \]</span></p>
-<div id="a-9" class="section level3">
+<div id="a-5" class="section level3">
 <h3>(a)</h3>
 <p>事前分布は一様分布(<span class="math inline">\(f(x) = C \quad (-\infty &lt; x &lt; \infty)\)</span>)であるとすると、</p>
 <p><span class="math display">\[
@@ -1192,9 +874,9 @@ p = function (mu) {
   pnorm(70, mu, 10) * (1 - pnorm(70, mu, 10))^17
 }
 plot(mu, p(mu) / sum(p(mu)), type = &quot;l&quot;)</code></pre>
-<p><img src="Exercise_files/figure-html/unnamed-chunk-67-1.png" width="672" /></p>
+<p><img src="chapter3_files/figure-html/unnamed-chunk-40-1.png" width="672" /></p>
 </div>
-<div id="b-9" class="section level3">
+<div id="b-5" class="section level3">
 <h3>(b)</h3>
 <p>グリッド近似した際の、各グリッドの値を <span class="math inline">\(\mu_i\)</span>、グリッド数を <span class="math inline">\(N\)</span> とすると、事後平均は以下のように表せる.</p>
 <p><span class="math display">\[
@@ -1209,7 +891,7 @@ post = p(mu) / sum(p(mu))
 sum(mu * post) # 事後平均</code></pre>
 <pre><code>## [1] 87.11109</code></pre>
 </div>
-<div id="c-7" class="section level3">
+<div id="c-5" class="section level3">
 <h3>(c)</h3>
 <p><span class="math inline">\(P(\mu &gt; 80)\)</span> を求めればよいので、以下のようになる．</p>
 <pre class="r"><code>mu = seq(0, 150, by = 0.1) # 速度は 0 以上であるので、加えて、最大値は 200 とした．
@@ -1234,12 +916,12 @@ p = function (mu) {
 }
 post = p(mu) / sum(p(mu))
 plot(mu, post, xlim = c(70, 110), type = &quot;l&quot;)</code></pre>
-<p><img src="Exercise_files/figure-html/unnamed-chunk-71-1.png" width="672" /></p>
+<p><img src="chapter3_files/figure-html/unnamed-chunk-44-1.png" width="672" /></p>
 </div>
 </div>
-<div id="section-15" class="section level2">
+<div id="section-9" class="section level2">
 <h2>3-7</h2>
-<div id="a-10" class="section level3">
+<div id="a-6" class="section level3">
 <h3>(a)</h3>
 <p><span class="math display">\[
 g(\lambda) = 0.5 \cdot gamma(\lambda|1.5, 1000) + 0.5 \cdot gamma(\lambda|7, 1000)
@@ -1253,9 +935,9 @@ g = function (lambda) {
   0.5 * dgamma(lambda, shape = 1.5, rate = 1000) + 0.5 * dgamma(lambda, shape = 7, rate = 1000)
 }
 plot(lambda, g(lambda), xlim = c(0, 0.1), type = &quot;l&quot;)</code></pre>
-<p><img src="Exercise_files/figure-html/unnamed-chunk-72-1.png" width="672" /></p>
+<p><img src="chapter3_files/figure-html/unnamed-chunk-45-1.png" width="672" /></p>
 </div>
-<div id="b-10" class="section level3">
+<div id="b-6" class="section level3">
 <h3>(b)</h3>
 <p>死亡数 <span class="math inline">\(y\)</span> は、暴露数 <span class="math inline">\(e\)</span> と死亡率 <span class="math inline">\(\lambda\)</span> としたとき、平均 <span class="math inline">\(e\lambda\)</span> のポアソン分布に従うと考えられる．</p>
 <p><span class="math display">\[
@@ -1309,7 +991,7 @@ post</code></pre>
 ## gamma.par1  5.5 2767
 ## gamma.par2 11.0 2767</code></pre>
 </div>
-<div id="c-8" class="section level3">
+<div id="c-6" class="section level3">
 <h3>(c)</h3>
 <pre class="r"><code>lambda = seq(0, 1, by = 0.001)
 g = function (lambda) {
@@ -1321,9 +1003,9 @@ post = function (lambda) {
 plot(lambda, g(lambda), xlim = c(0, 0.02), ylim = c(0, 500), ylab = &quot;&quot;, type = &quot;l&quot;, lty = 2)
 par(new=T)  
 plot(lambda, post(lambda), xlim = c(0, 0.02), ylim = c(0, 500), ylab = &quot;&quot;, type = &quot;l&quot;)</code></pre>
-<p><img src="Exercise_files/figure-html/unnamed-chunk-75-1.png" width="672" /></p>
+<p><img src="chapter3_files/figure-html/unnamed-chunk-48-1.png" width="672" /></p>
 </div>
-<div id="d-6" class="section level3">
+<div id="d-4" class="section level3">
 <h3>(d)</h3>
 <p><span class="math inline">\(P(\lambda &gt; 0.005) = 1 - P(\lambda \le 0.005) = 1 - \int_0^{0.005} p(\lambda) d\lambda\)</span> である．</p>
 <pre class="r"><code># 数値積分
@@ -1344,7 +1026,7 @@ post_sample = function () {
 }
 sample = replicate(100000, post_sample())
 sum(sample &gt; 0.005) / 100000</code></pre>
-<pre><code>## [1] 0.04825</code></pre>
+<pre><code>## [1] 0.0481</code></pre>
 <pre class="r"><code># グリッド近似
 lambda = seq(0, 1, by = 0.000001)
 p = function (lambda) {
@@ -1354,12 +1036,12 @@ post = p(lambda) / sum(p(lambda))
 sum(cbind(lambda, post)[lambda &gt; 0.005, 2])</code></pre>
 <pre><code>## [1] 0.04763969</code></pre>
 </div>
-<div id="e-1" class="section level3">
+<div id="e" class="section level3">
 <h3>(e)</h3>
 <p>混合確率は、<span class="math inline">\(g_1(\lambda), g_2(\lambda)\)</span> のそれぞれ 0.7597182、0.2402818 となっているので、このデータは <span class="math inline">\(g_1(\lambda)\)</span> に適合していると考えられる．</p>
 </div>
 </div>
-<div id="section-16" class="section level2">
+<div id="section-10" class="section level2">
 <h2>3-8</h2>
 <p><span class="math display">\[
 f(y:\lambda) = Exp(y|\lambda) \\
@@ -1370,7 +1052,7 @@ F(y;\lambda) = \int_{-\infty}^{y} f(y:\lambda) dy
 <p><span class="math display">\[
 L(\lambda) \propto F(100;\lambda)^3 f(100;\lambda) (F(300;\lambda) - F(100;\lambda))^3 f(100;\lambda) (1 - F(300;\lambda))^4
 \]</span></p>
-<div id="a-11" class="section level3">
+<div id="a-7" class="section level3">
 <h3>(a)</h3>
 <p>事前分布は以下とする．</p>
 <p><span class="math display">\[
@@ -1393,9 +1075,9 @@ p = function (lambda) {
 post = p(lambda)
 post = post / sum(post)
 plot(lambda, post, type = &quot;l&quot;)</code></pre>
-<p><img src="Exercise_files/figure-html/unnamed-chunk-79-1.png" width="672" /></p>
+<p><img src="chapter3_files/figure-html/unnamed-chunk-52-1.png" width="672" /></p>
 </div>
-<div id="b-11" class="section level3">
+<div id="b-7" class="section level3">
 <h3>(b)</h3>
 <pre class="r"><code># グリッド近似を用いる
 lambda = seq(0.1, 1000, by = 0.1)
@@ -1411,7 +1093,7 @@ mu</code></pre>
 <pre class="r"><code>sqrt(sum((lambda - mu)^2 * post))</code></pre>
 <pre><code>## [1] 127.6595</code></pre>
 </div>
-<div id="c-9" class="section level3">
+<div id="c-7" class="section level3">
 <h3>(c)</h3>
 <pre class="r"><code># グリッド近似を用いる
 lambda = seq(0.1, 1000, by = 0.1)
@@ -1424,9 +1106,6 @@ post = post / sum(post)
 sum(cbind(lambda, post)[300 &lt; lambda &amp; lambda &lt; 500, 2])</code></pre>
 <pre><code>## [1] 0.4059514</code></pre>
 </div>
-</div>
-<div id="section-17" class="section level2">
-<h2>4-1</h2>
 </div>
 
 

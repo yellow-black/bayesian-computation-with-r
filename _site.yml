@@ -1,10 +1,8 @@
 name: "Bayesian-Computation-With-R"
 output_dir: "docs"
 navbar:
-  title: "Bayesian-Computation-With-R"
+  title: "Bayesian-Computation-With-R(Rで学ぶベイズ統計学入門)"
   left:
     - text: "Home"
       href: index.html
-    - text: "Exercise"
-      href: Exercise.html
 theme: cosmo
