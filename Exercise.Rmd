@@ -3,6 +3,9 @@ title: "Exercise"
 author: "s-takano"
 output:
   pdf_document: 
+    pandoc_args: --listings
+    includes:
+      in_header: preamble.tex
     latex_engine: xelatex
   html_document: default
 documentclass: bxjsarticle
@@ -108,7 +111,8 @@ plot(q, pbeta(q, 23, 8), type ="l")
 ### (c)
 
 ```{r}
-rbeta(1000, 23, 8)
+sample = rbeta(1000, 23, 8)
+sample[1:100]
 ```
 
 ### (d)
@@ -537,13 +541,18 @@ $$
 $\int Beta(p|545, 555) dp = 1, \int Beta(p|46, 56) dp = 1$ より、混合比率に関しては、混合比率を $\gamma$ とすると、以下の式になる．
 
 $$
-\gamma : 1 - \gamma = 0.9 \cdot \frac{B(545, 555)}{B(500, 500)} : 0.1 \cdot B(46, 56) \\
+\gamma : 1 - \gamma = 0.9 \cdot \frac{B(545, 555)}{B(500, 500)} : 0.1 \cdot B(46, 56)
+$$
+
+$$
 \begin{aligned}
   (1 - \gamma) \cdot (0.9 \cdot \frac{B(545, 555)}{B(500, 500)}) &= \gamma \cdot 0.1 \cdot B(46, 56) \\
   (0.9 \cdot \frac{B(545, 555)}{B(500, 500)}) - \gamma \cdot (0.9 \cdot \frac{B(545, 555)}{B(500, 500)}) &= \gamma \cdot 0.1 \cdot B(46, 56) \\
   \{ (0.9 \cdot \frac{B(545, 555)}{B(500, 500)}) + 0.1 \cdot B(46, 56) \} \gamma &= (0.9 \cdot \frac{B(545, 555)}{B(500, 500)})
 \end{aligned} 
-\\
+$$
+
+$$
 \gamma = \frac{(0.9 \cdot \frac{B(545, 555)}{B(500, 500)})}{(0.9 \cdot \frac{B(545, 555)}{B(500, 500)}) + 0.1 \cdot B(46, 56)}
 $$
 
@@ -703,12 +712,17 @@ $$
 $\int Beta(p|9 ,16) = 1$ と $p^{8} (1-p)^{20 - 8} I(p = 0.2) = (0.2)^8 (1 - 0.2)^{12}$ より、係数に関しては以下のようになる．
 
 $$
-\gamma : 1 - \gamma = (0.2)^8 (1 - 0.2)^{12} : \frac{B(9 , 16)}{B(1, 4)} \\
+\gamma : 1 - \gamma = (0.2)^8 (1 - 0.2)^{12} : \frac{B(9 , 16)}{B(1, 4)}
+$$
+
+$$
 \begin{aligned}
   (1 - \gamma) \cdot (0.2)^8 (1 - 0.2)^{12} &= \gamma \cdot \frac{B(9 , 16)}{B(1, 4)} \\
   (0.2)^8 (1 - 0.2)^{12} - \gamma \cdot (0.2)^8 (1 - 0.2)^{12} &= \gamma \cdot \frac{B(9 , 16)}{B(1, 4)} \\
 \end{aligned} 
-\\
+$$
+
+$$
 \gamma = \frac{(0.2)^8(1 - 0.2)^{12}}{(0.2)^8 (1 - 0.2)^{12} + \frac{B(9 , 16)}{B(1, 4)}}
 $$
 
@@ -770,8 +784,10 @@ $$
 $\int Beta(p|8.5, 14) = 1$ と $p^{8} (1-p)^{20 - 8} I(p = 0.2) = (0.2)^8 (1 - 0.2)^{12}$ より、係数に関しては以下のようになる．
 
 $$
-\gamma : 1 - \gamma = (0.2)^8 (1 - 0.2)^{12} : \frac{B(8.5, 14)}{B(0.5, 2)} \\
-\gamma = \frac{(0.2)^8(1 - 0.2)^{12}}{(0.2)^8 (1 - 0.2)^{12} + \frac{B(8.5, 14)}{B(0.5, 2)}}
+\begin{aligned}
+  \gamma : 1 - \gamma = (0.2)^8 (1 - 0.2)^{12} : \frac{B(8.5, 14)}{B(0.5, 2)} \\
+  \gamma = \frac{(0.2)^8(1 - 0.2)^{12}}{(0.2)^8 (1 - 0.2)^{12} + \frac{B(8.5, 14)}{B(0.5, 2)}}
+\end{aligned}
 $$
 
 ```{r}
@@ -857,8 +873,10 @@ $$
 $\int Beta(p|16, 44) = 1$ と $p^{8} (1-p)^{20 - 8} I(p = 0.2) = (0.2)^8 (1 - 0.2)^{12}$ より、係数に関しては以下のようになる．
 
 $$
-\gamma : 1 - \gamma = (0.2)^8 (1 - 0.2)^{12} : \frac{B(16, 44)}{B(8, 32)} \\
-\gamma = \frac{(0.2)^8(1 - 0.2)^{12}}{(0.2)^8 (1 - 0.2)^{12} + \frac{B(16, 44)}{B(8, 32)}}
+\begin{aligned}
+  \gamma : 1 - \gamma = (0.2)^8 (1 - 0.2)^{12} : \frac{B(16, 44)}{B(8, 32)} \\
+  \gamma = \frac{(0.2)^8(1 - 0.2)^{12}}{(0.2)^8 (1 - 0.2)^{12} + \frac{B(16, 44)}{B(8, 32)}}
+\end{aligned}
 $$
 
 ```{r}
@@ -1011,9 +1029,11 @@ $$
 ここで、混合比率を $\pi$ とすると、
 
 $$
-\pi : 1 - \pi = \frac{1000^{1.5}}{\Gamma(1.5)} \frac{\Gamma(5.5)}{2767^{5.5}} : \frac{1000^{7}}{\Gamma(7)} \frac{\Gamma(11)}{2767^{11}} \\
-a = \frac{1000^{1.5}}{\Gamma(1.5)} \frac{\Gamma(5.5)}{2767^{5.5}}, b = \frac{1000^{7}}{\Gamma(7)} \frac{\Gamma(11)}{2767^{11}} \\
-\pi = \frac{a}{a + b}
+\begin{aligned}
+  \pi : 1 - \pi = \frac{1000^{1.5}}{\Gamma(1.5)} \frac{\Gamma(5.5)}{2767^{5.5}} : \frac{1000^{7}}{\Gamma(7)} \frac{\Gamma(11)}{2767^{11}} \\
+  a = \frac{1000^{1.5}}{\Gamma(1.5)} \frac{\Gamma(5.5)}{2767^{5.5}}, b = \frac{1000^{7}}{\Gamma(7)} \frac{\Gamma(11)}{2767^{11}} \\
+  \pi = \frac{a}{a + b}  
+\end{aligned}
 $$
 
 ```{r}
