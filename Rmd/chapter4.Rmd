@@ -1,0 +1,157 @@
+---
+title: "chapter3"
+author: "s-takano"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+set.seed(29)
+```
+
+```{r library}
+library(LearnBayes)
+```
+
+## 4-1
+
+$$
+y_1, y_2, \ldots, y_{20} \sim \mathcal{N}(\mu, \sigma^2)
+$$
+
+データとしては、以下が与えられている．
+
+```{r}
+y = c(9.0, 8.5, 7.0, 8.5, 6.0, 12.5, 6.0, 9.0, 8.5, 7.5, 8.0, 6.0, 9.0, 8.0, 7.0, 10.0, 9.0, 7.5, 5.0, 6.5)
+y
+length(y)
+```
+
+無情報事前分布として、$g(\mu, \sigma^2) \propto \frac{1}{\sigma^2}$ とすると、
+
+$$
+\begin{aligned}
+  g(\mu, \sigma^2|y) 
+  &\propto \frac{1}{\sigma^2} \prod_{i = 1}^n \mathcal{N}(\mu, \sigma^2) \\
+  &= \frac{1}{\sigma^2} \prod_{i = 1}^n \frac{1}{\sqrt{2\pi\sigma}} \exp \left( - \frac{1}{2\sigma^2} (y_i - \mu)^2 \right) \\  
+  &\propto \frac{1}{(\sigma^2)^{\frac{n}{2}+1}} \exp \left( \sum_{i = 1}^n - \frac{1}{2\sigma^2} (y_i - \mu)^2 \right) \\  
+  &\propto \frac{1}{(\sigma^2)^{\frac{n}{2}+1}} \exp \left( - \frac{1}{2\sigma^2} \sum_{i = 1}^n (y_i + \bar{y} - \bar{y} - \mu)^2 \right) \\ 
+  &\propto \frac{1}{(\sigma^2)^{\frac{n}{2}+1}} \exp \left( - \frac{1}{2\sigma^2} \sum_{i = 1}^n \left( (y_i - \bar{y})^2 +2(y_i - \bar{y})(\bar{y} - \mu) + (\bar{y} - \mu)^2 \right) \right) \\ 
+  &\propto \frac{1}{(\sigma^2)^{\frac{n}{2}+1}} \exp \left( - \frac{1}{2\sigma^2} \sum_{i = 1}^n \left( (y_i - \bar{y})^2  \right) + 2n(\bar{y} - \bar{y})(\bar{y} - \mu) + n(\bar{y} - \mu)^2 \right) \\ 
+  &\propto \frac{1}{(\sigma^2)^{\frac{n}{2}+1}} \exp \left( - \frac{1}{2\sigma^2} (\sum_{i = 1}^n (y_i - \bar{y})^2 + n(\mu - \bar{y})^2) \right) 
+\end{aligned}
+$$
+
+となる．
+ここで、
+
+$$
+\begin{aligned}
+  g(\mu|y, \sigma^2)
+  &= \frac{g(\mu, \sigma^2|y)}{g(\sigma^2|y)} \\
+  &\propto g(\mu, \sigma^2|y) \\
+  &\propto \frac{1}{(\sigma^2)^{\frac{n}{2}+1}} \exp \left( - \frac{1}{2\sigma^2} (\sum_{i = 1}^n (y_i - \bar{y})^2 + n(\mu - \bar{y})^2) \right) \\
+  &\propto \exp \left( - \frac{1}{2\sigma^2} (\sum_{i = 1}^n (y_i - \bar{y})^2 + n(\mu - \bar{y})^2) \right) \\
+  &\propto \exp \left( - \frac{1}{2\sigma^2} n(\mu - \bar{y})^2 \right) \\
+  &\propto \exp \left( - \frac{1}{2(\frac{\sigma}{\sqrt{n}})^2} (\mu - \bar{y})^2 \right) \\
+\end{aligned}
+$$
+
+である．
+よって、
+
+$$
+g(\mu|y, \sigma^2) = \mathcal{N}(\bar{y}, (\frac{\sigma}{\sqrt{n}})^2)
+$$
+
+また、
+
+$$
+\begin{aligned}
+  g(\sigma^2|y)  
+  &= \int g(\mu, \sigma^2|y) d\mu \\
+  &= \int \frac{1}{(\sigma^2)^{\frac{n}{2}+1}} \exp \left( - \frac{1}{2\sigma^2} (\sum_{i = 1}^n (y_i - \bar{y})^2 + n(\mu - \bar{y})^2) \right) d\mu \\
+  &= \frac{1}{(\sigma^2)^{\frac{n}{2}+1}} \int \exp \left( - \frac{1}{2\sigma^2} (\sum_{i = 1}^n (y_i - \bar{y})^2 + n(\mu - \bar{y})^2) \right) d\mu \\
+  &= \frac{1}{(\sigma^2)^{\frac{n}{2}+1}} \exp \left( - \frac{1}{2\sigma^2} \sum_{i = 1}^n (y_i - \bar{y})^2 \right) \int \exp \left( - \frac{1}{2\sigma^2} n(\mu - \bar{y})^2 \right) d\mu \\
+  &\propto \frac{1}{(\sigma^2)^{\frac{n}{2}+1}} \exp \left( - \frac{1}{2\sigma^2} \sum_{i = 1}^n (y_i - \bar{y})^2 \right) \int \exp \left( - \frac{1}{2(\frac{\sigma}{\sqrt{n}})^2} (\mu - \bar{y})^2 \right) d\mu \\
+\end{aligned}
+$$
+
+ここで、
+
+$$
+\int \exp \left( - \frac{1}{2(\frac{\sigma}{\sqrt{n}})^2} (\mu - \bar{y})^2 \right) d\mu
+$$
+
+は、$\mathcal{N}(\bar{y}, (\frac{\sigma}{\sqrt{n}})^2)$ の正規化項に相当するので、
+
+$$
+\int \exp \left( - \frac{1}{2(\frac{\sigma}{\sqrt{n}})^2} (\mu - \bar{y})^2 \right) d\mu = \sqrt{2\pi(\frac{\sigma}{\sqrt{n}})^2} = \sqrt{\frac{2\pi\sigma^2}{n}}
+$$
+
+である．
+
+$$
+\begin{aligned}
+  g(\sigma^2|y)  
+  &\propto \frac{1}{(\sigma^2)^{\frac{n}{2}+1}} \exp \left( - \frac{1}{2\sigma^2} \sum_{i = 1}^n (y_i - \bar{y})^2 \right) \int \exp \left( - \frac{1}{2(\frac{\sigma}{\sqrt{n}})^2} (\mu - \bar{y})^2 \right) d\mu \\
+  &= \frac{1}{(\sigma^2)^{\frac{n}{2}+1}} \exp \left( - \frac{1}{2\sigma^2} \sum_{i = 1}^n (y_i - \bar{y})^2 \right) \sqrt{\frac{2\pi\sigma^2}{n}} \\
+  &\propto \frac{\sigma}{(\sigma^2)^{\frac{n}{2}+1}} \exp \left( - \frac{1}{2\sigma^2} \sum_{i = 1}^n (y_i - \bar{y})^2 \right) \\
+  &= \frac{1}{(\sigma^2)^{\frac{n}{2}+1-\frac{1}{2}}} \exp \left( - \frac{1}{2\sigma^2} \sum_{i = 1}^n (y_i - \bar{y})^2 \right) \\
+  &= \frac{1}{(\sigma^2)^{\frac{n-1}{2}+1}} \exp \left( - \frac{1}{2\sigma^2} \sum_{i = 1}^n (y_i - \bar{y})^2 \right) \\
+  &= (\sigma^2)^{-\frac{n-1}{2}-1} \exp \left( - \frac{1}{2\sigma^2} \sum_{i = 1}^n (y_i - \bar{y})^2 \right) \\
+  &= (\sigma^2)^{-\frac{n-1}{2}-1} \exp \left( - \frac{1}{2\sigma^2} S \right) \\
+  &= (\sigma^2)^{-\frac{n-1}{2}-1} \exp \left( - \frac{1}{2}\frac{1}{\frac{\sigma^2}{S}} \right) \\
+  &\propto (\frac{\sigma^2}{S})^{-\frac{n-1}{2}-1} \exp \left( - \frac{1}{2}\frac{1}{\frac{\sigma^2}{S}} \right) \\
+\end{aligned}
+$$
+
+よって、$\frac{\sigma^2}{S}$ は [逆カイ二乗分布](https://mc-stan.org/docs/2_23/functions-reference/inverse-chi-square-distribution.html) に従う．
+
+$$
+\frac{\sigma^2}{S} \sim InvChiSquare(n-1)
+$$
+
+### (a)
+
+$$
+g_{\mu,\sigma^2}(\mu, \sigma^2|y) = g_{\mu|\sigma^2}(\mu|\sigma^2, y)g_{\sigma^2}(\sigma^2|y)
+$$
+
+であるので、以下のようなアルゴリズムでサンプリングが可能である．
+
+$$
+\begin{aligned}
+  \frac{\sigma^2}{S} &\sim InvChiSquare(n-1) \\
+  \mu &\sim \mathcal{N}(\bar{y}, (\frac{\sigma}{\sqrt{n}})^2) \\ 
+\end{aligned}
+$$
+
+ここで、$S = \sum_{i = 1}^n (y_i - \bar{y})^2$ である．
+
+```{r}
+S = sum((y - mean(y))^2)
+n = length(y)
+sigma2 = S * 1/rchisq(1000, n - 1)
+mu = rnorm(1000, mean = mean(y), sd = sqrt(sigma2)/sqrt(n))
+plot(mu, sigma2)
+```
+
+### (b)
+
+```{r}
+quantile(mu, c(0.05, 0.95))
+quantile(sqrt(sigma2), c(0.05, 0.95))
+```
+
+### (c)
+
+```{r}
+p_75 = mu + 0.674 * sqrt(sigma2)
+mean(p_75)
+sd(p_75)
+```
+
+

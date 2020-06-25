@@ -335,7 +335,7 @@ round(cbind(p, prior, posterior), 3)</code></pre>
 <pre class="r"><code>midpt = seq(0.05, 0.95, by = 0.1)
 prior = rep(0.1, 10) # 無情報事前分布
 curve(histprior(x, midpt, prior), from = 0, to = 1)</code></pre>
-<p><img src="chapter2_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<p><img src="chapter2_files/figure-html/unnamed-chunk-18-1.png" width="672" /></p>
 </div>
 <div id="事後分布-1" class="section level3">
 <h3>事後分布</h3>
@@ -348,7 +348,7 @@ for (i in length(p)) {
 posterior = posterior / sum(posterior)
 ps = sample(p, replace = TRUE, prob = posterior)
 hist(ps)</code></pre>
-<p><img src="chapter2_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<p><img src="chapter2_files/figure-html/unnamed-chunk-19-1.png" width="672" /></p>
 </div>
 </div>
 <div id="section-2" class="section level2">
@@ -357,13 +357,13 @@ hist(ps)</code></pre>
 <h3>事前分布</h3>
 <pre class="r"><code>p = seq(0, 1, length=100)
 plot(p, dbeta(p, 1, 1), type =&quot;l&quot;)</code></pre>
-<p><img src="chapter2_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<p><img src="chapter2_files/figure-html/unnamed-chunk-20-1.png" width="672" /></p>
 </div>
 <div id="事後分布-2" class="section level3">
 <h3>事後分布</h3>
 <pre class="r"><code>p = seq(0, 1, length=100)
 plot(p, dbeta(p, 23, 8), type =&quot;l&quot;)</code></pre>
-<p><img src="chapter2_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<p><img src="chapter2_files/figure-html/unnamed-chunk-21-1.png" width="672" /></p>
 </div>
 <div id="a" class="section level3">
 <h3>(a)</h3>
@@ -374,7 +374,7 @@ plot(p, dbeta(p, 23, 8), type =&quot;l&quot;)</code></pre>
 <h3>(b)</h3>
 <pre class="r"><code>q = seq(0, 1, length=100)
 plot(q, pbeta(q, 23, 8), type =&quot;l&quot;)</code></pre>
-<p><img src="chapter2_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+<p><img src="chapter2_files/figure-html/unnamed-chunk-23-1.png" width="672" /></p>
 <pre class="r"><code>1 - pbeta(0.6, 23, 8)</code></pre>
 <pre><code>## [1] 0.9564759</code></pre>
 </div>
@@ -481,12 +481,12 @@ predict</code></pre>
 <pre><code>##  [1] 0.1578479672 0.2447719936 0.2093137913 0.1475812240 0.1001416403 0.0652427436 0.0393037888 0.0212231429
 ##  [9] 0.0098095892 0.0036170714 0.0009692955 0.0001645993 0.0000131530</code></pre>
 <pre class="r"><code>plot(0:12, predict, type = &quot;l&quot;)</code></pre>
-<p><img src="chapter2_files/figure-html/unnamed-chunk-18-1.png" width="672" /></p>
+<p><img src="chapter2_files/figure-html/unnamed-chunk-31-1.png" width="672" /></p>
 <pre class="r"><code>pdiscp(p, prior, 12, 0:12)</code></pre>
 <pre><code>##  [1] 0.1578479672 0.2447719936 0.2093137913 0.1475812240 0.1001416403 0.0652427436 0.0393037888 0.0212231429
 ##  [9] 0.0098095892 0.0036170714 0.0009692955 0.0001645993 0.0000131530</code></pre>
 <pre class="r"><code>plot(0:12, pdiscp(p, prior, 12, 0:12), type = &quot;l&quot;)</code></pre>
-<p><img src="chapter2_files/figure-html/unnamed-chunk-19-1.png" width="672" /></p>
+<p><img src="chapter2_files/figure-html/unnamed-chunk-32-1.png" width="672" /></p>
 </div>
 <div id="ベータ分布" class="section level4">
 <h4>ベータ分布</h4>
@@ -509,12 +509,12 @@ predict</code></pre>
 <pre class="r"><code>sum(predict)</code></pre>
 <pre><code>## [1] 1</code></pre>
 <pre class="r"><code>plot(0:12, predict, type = &quot;l&quot;)</code></pre>
-<p><img src="chapter2_files/figure-html/unnamed-chunk-20-1.png" width="672" /></p>
+<p><img src="chapter2_files/figure-html/unnamed-chunk-33-1.png" width="672" /></p>
 <pre class="r"><code>pbetap(c(3, 12), 12, 0:12)</code></pre>
 <pre><code>##  [1] 1.400000e-01 2.191304e-01 2.191304e-01 1.739130e-01 1.173913e-01 6.919908e-02 3.588101e-02 1.628214e-02
 ##  [9] 6.360210e-03 2.072957e-03 5.330462e-04 9.691749e-05 9.422533e-06</code></pre>
 <pre class="r"><code>plot(0:12, pbetap(c(3, 12), 12, 0:12), type = &quot;l&quot;)</code></pre>
-<p><img src="chapter2_files/figure-html/unnamed-chunk-21-1.png" width="672" /></p>
+<p><img src="chapter2_files/figure-html/unnamed-chunk-34-1.png" width="672" /></p>
 </div>
 </div>
 </div>

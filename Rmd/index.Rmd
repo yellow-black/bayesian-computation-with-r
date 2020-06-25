@@ -9,6 +9,7 @@ author: "s-takano"
 
 - [Chapter2](./chapter2.html)
 - [Chapter3](./chapter3.html)
+- [Chapter4](./chapter4.html)
 
 ## Links
 

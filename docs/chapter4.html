@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="s-takano" />
+
+
+<title>chapter3</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html"></a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">chapter3</h1>
+<h4 class="author">s-takano</h4>
+
+</div>
+
+
+<pre class="r"><code>set.seed(29)</code></pre>
+<pre class="r"><code>library(LearnBayes)</code></pre>
+<div id="section" class="section level2">
+<h2>4-1</h2>
+<p><span class="math display">\[
+y_1, y_2, \ldots, y_{20} \sim \mathcal{N}(\mu, \sigma^2)
+\]</span></p>
+<p>データとしては、以下が与えられている．</p>
+<pre class="r"><code>y = c(9.0, 8.5, 7.0, 8.5, 6.0, 12.5, 6.0, 9.0, 8.5, 7.5, 8.0, 6.0, 9.0, 8.0, 7.0, 10.0, 9.0, 7.5, 5.0, 6.5)
+y</code></pre>
+<pre><code>##  [1]  9.0  8.5  7.0  8.5  6.0 12.5  6.0  9.0  8.5  7.5  8.0  6.0  9.0  8.0  7.0 10.0  9.0  7.5  5.0  6.5</code></pre>
+<pre class="r"><code>length(y)</code></pre>
+<pre><code>## [1] 20</code></pre>
+<p>無情報事前分布として、<span class="math inline">\(g(\mu, \sigma^2) \propto \frac{1}{\sigma^2}\)</span> とすると、</p>
+<p><span class="math display">\[
+\begin{aligned}
+  g(\mu, \sigma^2|y) 
+  &amp;\propto \frac{1}{\sigma^2} \prod_{i = 1}^n \mathcal{N}(\mu, \sigma^2) \\
+  &amp;= \frac{1}{\sigma^2} \prod_{i = 1}^n \frac{1}{\sqrt{2\pi\sigma}} \exp \left( - \frac{1}{2\sigma^2} (y_i - \mu)^2 \right) \\  
+  &amp;\propto \frac{1}{(\sigma^2)^{\frac{n}{2}+1}} \exp \left( \sum_{i = 1}^n - \frac{1}{2\sigma^2} (y_i - \mu)^2 \right) \\  
+  &amp;\propto \frac{1}{(\sigma^2)^{\frac{n}{2}+1}} \exp \left( - \frac{1}{2\sigma^2} \sum_{i = 1}^n (y_i + \bar{y} - \bar{y} - \mu)^2 \right) \\ 
+  &amp;\propto \frac{1}{(\sigma^2)^{\frac{n}{2}+1}} \exp \left( - \frac{1}{2\sigma^2} \sum_{i = 1}^n \left( (y_i - \bar{y})^2 +2(y_i - \bar{y})(\bar{y} - \mu) + (\bar{y} - \mu)^2 \right) \right) \\ 
+  &amp;\propto \frac{1}{(\sigma^2)^{\frac{n}{2}+1}} \exp \left( - \frac{1}{2\sigma^2} \sum_{i = 1}^n \left( (y_i - \bar{y})^2  \right) + 2n(\bar{y} - \bar{y})(\bar{y} - \mu) + n(\bar{y} - \mu)^2 \right) \\ 
+  &amp;\propto \frac{1}{(\sigma^2)^{\frac{n}{2}+1}} \exp \left( - \frac{1}{2\sigma^2} (\sum_{i = 1}^n (y_i - \bar{y})^2 + n(\mu - \bar{y})^2) \right) 
+\end{aligned}
+\]</span></p>
+<p>となる． ここで、</p>
+<p><span class="math display">\[
+\begin{aligned}
+  g(\mu|y, \sigma^2)
+  &amp;= \frac{g(\mu, \sigma^2|y)}{g(\sigma^2|y)} \\
+  &amp;\propto g(\mu, \sigma^2|y) \\
+  &amp;\propto \frac{1}{(\sigma^2)^{\frac{n}{2}+1}} \exp \left( - \frac{1}{2\sigma^2} (\sum_{i = 1}^n (y_i - \bar{y})^2 + n(\mu - \bar{y})^2) \right) \\
+  &amp;\propto \exp \left( - \frac{1}{2\sigma^2} (\sum_{i = 1}^n (y_i - \bar{y})^2 + n(\mu - \bar{y})^2) \right) \\
+  &amp;\propto \exp \left( - \frac{1}{2\sigma^2} n(\mu - \bar{y})^2 \right) \\
+  &amp;\propto \exp \left( - \frac{1}{2(\frac{\sigma}{\sqrt{n}})^2} (\mu - \bar{y})^2 \right) \\
+\end{aligned}
+\]</span></p>
+<p>である． よって、</p>
+<p><span class="math display">\[
+g(\mu|y, \sigma^2) = \mathcal{N}(\bar{y}, (\frac{\sigma}{\sqrt{n}})^2)
+\]</span></p>
+<p>また、</p>
+<p><span class="math display">\[
+\begin{aligned}
+  g(\sigma^2|y)  
+  &amp;= \int g(\mu, \sigma^2|y) d\mu \\
+  &amp;= \int \frac{1}{(\sigma^2)^{\frac{n}{2}+1}} \exp \left( - \frac{1}{2\sigma^2} (\sum_{i = 1}^n (y_i - \bar{y})^2 + n(\mu - \bar{y})^2) \right) d\mu \\
+  &amp;= \frac{1}{(\sigma^2)^{\frac{n}{2}+1}} \int \exp \left( - \frac{1}{2\sigma^2} (\sum_{i = 1}^n (y_i - \bar{y})^2 + n(\mu - \bar{y})^2) \right) d\mu \\
+  &amp;= \frac{1}{(\sigma^2)^{\frac{n}{2}+1}} \exp \left( - \frac{1}{2\sigma^2} \sum_{i = 1}^n (y_i - \bar{y})^2 \right) \int \exp \left( - \frac{1}{2\sigma^2} n(\mu - \bar{y})^2 \right) d\mu \\
+  &amp;\propto \frac{1}{(\sigma^2)^{\frac{n}{2}+1}} \exp \left( - \frac{1}{2\sigma^2} \sum_{i = 1}^n (y_i - \bar{y})^2 \right) \int \exp \left( - \frac{1}{2(\frac{\sigma}{\sqrt{n}})^2} (\mu - \bar{y})^2 \right) d\mu \\
+\end{aligned}
+\]</span></p>
+<p>ここで、</p>
+<p><span class="math display">\[
+\int \exp \left( - \frac{1}{2(\frac{\sigma}{\sqrt{n}})^2} (\mu - \bar{y})^2 \right) d\mu
+\]</span></p>
+<p>は、<span class="math inline">\(\mathcal{N}(\bar{y}, (\frac{\sigma}{\sqrt{n}})^2)\)</span> の正規化項に相当するので、</p>
+<p><span class="math display">\[
+\int \exp \left( - \frac{1}{2(\frac{\sigma}{\sqrt{n}})^2} (\mu - \bar{y})^2 \right) d\mu = \sqrt{2\pi(\frac{\sigma}{\sqrt{n}})^2} = \sqrt{\frac{2\pi\sigma^2}{n}}
+\]</span></p>
+<p>である．</p>
+<p><span class="math display">\[
+\begin{aligned}
+  g(\sigma^2|y)  
+  &amp;\propto \frac{1}{(\sigma^2)^{\frac{n}{2}+1}} \exp \left( - \frac{1}{2\sigma^2} \sum_{i = 1}^n (y_i - \bar{y})^2 \right) \int \exp \left( - \frac{1}{2(\frac{\sigma}{\sqrt{n}})^2} (\mu - \bar{y})^2 \right) d\mu \\
+  &amp;= \frac{1}{(\sigma^2)^{\frac{n}{2}+1}} \exp \left( - \frac{1}{2\sigma^2} \sum_{i = 1}^n (y_i - \bar{y})^2 \right) \sqrt{\frac{2\pi\sigma^2}{n}} \\
+  &amp;\propto \frac{\sigma}{(\sigma^2)^{\frac{n}{2}+1}} \exp \left( - \frac{1}{2\sigma^2} \sum_{i = 1}^n (y_i - \bar{y})^2 \right) \\
+  &amp;= \frac{1}{(\sigma^2)^{\frac{n}{2}+1-\frac{1}{2}}} \exp \left( - \frac{1}{2\sigma^2} \sum_{i = 1}^n (y_i - \bar{y})^2 \right) \\
+  &amp;= \frac{1}{(\sigma^2)^{\frac{n-1}{2}+1}} \exp \left( - \frac{1}{2\sigma^2} \sum_{i = 1}^n (y_i - \bar{y})^2 \right) \\
+  &amp;= (\sigma^2)^{-\frac{n-1}{2}-1} \exp \left( - \frac{1}{2\sigma^2} \sum_{i = 1}^n (y_i - \bar{y})^2 \right) \\
+  &amp;= (\sigma^2)^{-\frac{n-1}{2}-1} \exp \left( - \frac{1}{2\sigma^2} S \right) \\
+  &amp;= (\sigma^2)^{-\frac{n-1}{2}-1} \exp \left( - \frac{1}{2}\frac{1}{\frac{\sigma^2}{S}} \right) \\
+  &amp;\propto (\frac{\sigma^2}{S})^{-\frac{n-1}{2}-1} \exp \left( - \frac{1}{2}\frac{1}{\frac{\sigma^2}{S}} \right) \\
+\end{aligned}
+\]</span></p>
+<p>よって、<span class="math inline">\(\frac{\sigma^2}{S}\)</span> は <a href="https://mc-stan.org/docs/2_23/functions-reference/inverse-chi-square-distribution.html">逆カイ二乗分布</a> に従う．</p>
+<p><span class="math display">\[
+\frac{\sigma^2}{S} \sim InvChiSquare(n-1)
+\]</span></p>
+<div id="a" class="section level3">
+<h3>(a)</h3>
+<p><span class="math display">\[
+g_{\mu,\sigma^2}(\mu, \sigma^2|y) = g_{\mu|\sigma^2}(\mu|\sigma^2, y)g_{\sigma^2}(\sigma^2|y)
+\]</span></p>
+<p>であるので、以下のようなアルゴリズムでサンプリングが可能である．</p>
+<p><span class="math display">\[
+\begin{aligned}
+  \frac{\sigma^2}{S} &amp;\sim InvChiSquare(n-1) \\
+  \mu &amp;\sim \mathcal{N}(\bar{y}, (\frac{\sigma}{\sqrt{n}})^2) \\ 
+\end{aligned}
+\]</span></p>
+<p>ここで、<span class="math inline">\(S = \sum_{i = 1}^n (y_i - \bar{y})^2\)</span> である．</p>
+<pre class="r"><code>S = sum((y - mean(y))^2)
+n = length(y)
+sigma2 = S * 1/rchisq(1000, n - 1)
+mu = rnorm(1000, mean = mean(y), sd = sqrt(sigma2)/sqrt(n))
+plot(mu, sigma2)</code></pre>
+<p><img src="chapter4_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+</div>
+<div id="b" class="section level3">
+<h3>(b)</h3>
+<pre class="r"><code>quantile(mu, c(0.05, 0.95))</code></pre>
+<pre><code>##       5%      95% 
+## 7.209646 8.615881</code></pre>
+<pre class="r"><code>quantile(sqrt(sigma2), c(0.05, 0.95))</code></pre>
+<pre><code>##       5%      95% 
+## 1.344823 2.405518</code></pre>
+</div>
+<div id="c" class="section level3">
+<h3>(c)</h3>
+<pre class="r"><code>p_75 = mu + 0.674 * sqrt(sigma2)
+mean(p_75)</code></pre>
+<pre><code>## [1] 9.116239</code></pre>
+<pre class="r"><code>sd(p_75)</code></pre>
+<pre><code>## [1] 0.4742668</code></pre>
+</div>
+</div>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
