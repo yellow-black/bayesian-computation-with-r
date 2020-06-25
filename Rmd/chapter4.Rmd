@@ -35,7 +35,7 @@ $$
 \begin{aligned}
   g(\mu, \sigma^2|y) 
   &\propto \frac{1}{\sigma^2} \prod_{i = 1}^n \mathcal{N}(\mu, \sigma^2) \\
-  &= \frac{1}{\sigma^2} \prod_{i = 1}^n \frac{1}{\sqrt{2\pi\sigma}} \exp \left( - \frac{1}{2\sigma^2} (y_i - \mu)^2 \right) \\  
+  &= \frac{1}{\sigma^2} \prod_{i = 1}^n \frac{1}{\sqrt{2\pi}\sigma} \exp \left( - \frac{1}{2\sigma^2} (y_i - \mu)^2 \right) \\  
   &\propto \frac{1}{(\sigma^2)^{\frac{n}{2}+1}} \exp \left( \sum_{i = 1}^n - \frac{1}{2\sigma^2} (y_i - \mu)^2 \right) \\  
   &\propto \frac{1}{(\sigma^2)^{\frac{n}{2}+1}} \exp \left( - \frac{1}{2\sigma^2} \sum_{i = 1}^n (y_i + \bar{y} - \bar{y} - \mu)^2 \right) \\ 
   &\propto \frac{1}{(\sigma^2)^{\frac{n}{2}+1}} \exp \left( - \frac{1}{2\sigma^2} \sum_{i = 1}^n \left( (y_i - \bar{y})^2 +2(y_i - \bar{y})(\bar{y} - \mu) + (\bar{y} - \mu)^2 \right) \right) \\ 
@@ -153,5 +153,145 @@ p_75 = mu + 0.674 * sqrt(sigma2)
 mean(p_75)
 sd(p_75)
 ```
+
+## 4-2
+
+独立した標本が2つあり、それぞれ以下のようになっている．
+
+$$
+\begin{aligned}
+  x_1, x_2, \ldots, x_m &\sim \mathcal{N}(\mu_1,\sigma_1^2) \\
+  y_1, y_2, \ldots, y_n &\sim \mathcal{N}(\mu_2,\sigma_2^2) \\
+\end{aligned}
+$$
+
+事前分布を以下とする．
+
+$$
+g(\mu_1, \sigma_1^2, \mu_2, \sigma_2^2) \propto \frac{1}{\sigma_1^2\sigma_2^2}
+$$
+
+### (a)
+
+事後密度は以下のように計算できる[^1]．
+
+$$
+\begin{aligned}
+  g(\mu_1, \sigma_1^2, \mu_2, \sigma_2^2|x,y) 
+  &= \frac{g(\mu_1, \sigma_1^2, \mu_2, \sigma_2^2, x, y)}{g(x, y)} \\
+  &= \frac{g(x, y|\mu_1, \sigma_1^2, \mu_2, \sigma_2^2)g(\mu_1, \sigma_1^2, \mu_2, \sigma_2^2)}{g(x, y)} \\
+  &\propto \frac{g(x, y|\mu_1, \sigma_1^2, \mu_2, \sigma_2^2)}{g(x, y)}\frac{1}{\sigma_1^2\sigma_2^2} \\
+  &\propto g(x|\mu_1, \sigma_1^2, \mu_2, \sigma_2^2) \frac{1}{\sigma_1^2\sigma_2^2} \\
+  &= g(x|\mu_1, \sigma_1^2)g(y|\mu_2, \sigma_2^2) \frac{1}{\sigma_1^2\sigma_2^2} \\
+  &= 
+  \prod_{i = 1}^m \mathcal{N}(\mu_1, \sigma_1^2) 
+  \prod_{i = 1}^n \mathcal{N}(\mu_2, \sigma_2^2)
+  \frac{1}{\sigma_1^2\sigma_2^2} \\
+  &= 
+  \prod_{i = 1}^m \frac{1}{\sqrt{2\pi}\sigma_1} \exp \left( - \frac{1}{2\sigma_1^2} (x_i - \mu_1)^2 \right) 
+  \prod_{i = 1}^n \frac{1}{\sqrt{2\pi}\sigma_2} \exp \left( - \frac{1}{2\sigma_2^2} (y_i - \mu_2)^2 \right) 
+  \frac{1}{\sigma_1^2\sigma_2^2} \\
+  &\propto
+  \frac{1}{\sigma_1^m} \exp \left( - \frac{1}{2\sigma_1^2} \sum_{i = 1}^m (x_i - \mu_1)^2 \right) 
+  \frac{1}{\sigma_2^n} \exp \left( - \frac{1}{2\sigma_2^2} \sum_{i = 1}^n (y_i - \mu_2)^2 \right) 
+  \frac{1}{\sigma_1^2\sigma_2^2} \\
+  &=
+  \frac{1}{(\sigma_1^2)^{\frac{m}{2} + 1}} \exp \left( - \frac{1}{2\sigma_1^2} \sum_{i = 1}^m (x_i - \mu_1)^2 \right) 
+  \frac{1}{(\sigma_2^2)^{\frac{n}{2} + 1}} \exp \left( - \frac{1}{2\sigma_2^2} \sum_{i = 1}^n (y_i - \mu_2)^2 \right) \\
+  &=
+  \frac{1}{(\sigma_1^2)^{\frac{m}{2} + 1}} \exp \left( - \frac{1}{2\sigma_1^2} \sum_{i = 1}^m (x_i - \bar{x})^2 + m(\mu_1 - \bar{x})^2 \right) 
+  \frac{1}{(\sigma_2^2)^{\frac{n}{2} + 1}} \exp \left( - \frac{1}{2\sigma_2^2} \sum_{i = 1}^n (y_i - \bar{y})^2 + n(\mu_2 - \bar{y})^2 \right) \\
+  &=
+  \frac{1}{(\sigma_1^2)^{\frac{m}{2} + 1}} \exp \left( - \frac{1}{2\sigma_1^2} \sum_{i = 1}^m (x_i - \bar{x})^2 \right) 
+  \exp \left( - \frac{1}{2\sigma_1^2} m(\mu_1 - \bar{x})^2 \right) \\
+  &\times
+  \frac{1}{(\sigma_2^2)^{\frac{n}{2} + 1}} \exp \left( - \frac{1}{2\sigma_2^2} \sum_{i = 1}^n (y_i - \bar{y})^2 \right) 
+  \exp \left( - \frac{1}{2\sigma_2^2} n(\mu_2 - \bar{y})^2 \right) \\
+  &=
+  \frac{1}{(\sigma_1^2)^{\frac{m}{2} + 1}} \exp \left( - \frac{1}{2\sigma_1^2} S_1 \right) 
+  \exp \left( - \frac{1}{2\sigma_1^2} m(\mu_1 - \bar{x})^2 \right) \\
+  &\times
+  \frac{1}{(\sigma_2^2)^{\frac{n}{2} + 1}} \exp \left( - \frac{1}{2\sigma_2^2} S_2 \right) 
+  \exp \left( - \frac{1}{2\sigma_2^2} n(\mu_2 - \bar{y})^2 \right) \\
+  &=
+  \frac{1}{(\sigma_1^2)^{\frac{m}{2} + 1}} \exp \left( - \frac{1}{2\sigma_1^2} S_1 \right) 
+  \exp \left( - \frac{1}{2(\frac{\sigma_1}{\sqrt{m}})^2} (\mu_1 - \bar{x})^2 \right) \\
+  &\times
+  \frac{1}{(\sigma_2^2)^{\frac{n}{2} + 1}} \exp \left( - \frac{1}{2\sigma_2^2} S_2 \right) 
+  \exp \left( - \frac{1}{2(\frac{\sigma_1}{\sqrt{n}})^2} (\mu_2 - \bar{y})^2 \right) \\
+  &=
+  \frac{1}{(\sigma_1^2)^{\frac{m}{2} + 1}} \exp \left( - \frac{1}{2\sigma_1^2} S_1 \right) 
+  \mathcal{N}(\bar{x}, (\frac{\sigma_1}{\sqrt{m}})^2)
+  \int \exp \left( - \frac{1}{2(\frac{\sigma_1}{\sqrt{m}})^2} (\mu_1 - \bar{x})^2 \right) d\mu_1 \\
+  &\times
+  \frac{1}{(\sigma_2^2)^{\frac{n}{2} + 1}} \exp \left( - \frac{1}{2\sigma_2^2} S_2 \right) 
+  \mathcal{N}(\bar{y}, (\frac{\sigma_2}{\sqrt{n}})^2)
+  \int \exp \left( - \frac{1}{2(\frac{\sigma_2}{\sqrt{n}})^2} (\mu_2 - \bar{y})^2 \right) d\mu_2 \\
+  &=
+  \frac{1}{(\sigma_1^2)^{\frac{m}{2} + 1}} \exp \left( - \frac{1}{2\sigma_1^2} S_1 \right) 
+  \mathcal{N}(\bar{x}, (\frac{\sigma_1}{\sqrt{m}})^2)
+  \sqrt{\frac{2\pi\sigma_1^2}{m}} \\
+  &\times
+  \frac{1}{(\sigma_2^2)^{\frac{n}{2} + 1}} \exp \left( - \frac{1}{2\sigma_2^2} S_2 \right) 
+  \mathcal{N}(\bar{y}, (\frac{\sigma_2}{\sqrt{n}})^2)
+  \sqrt{\frac{2\pi\sigma_2^2}{n}} \\
+  &\propto
+  \frac{1}{(\sigma_1^2)^{\frac{m}{2} + 1}} \exp \left( - \frac{1}{2\sigma_1^2} S_1 \right) 
+  \mathcal{N}(\bar{x}, (\frac{\sigma_1}{\sqrt{m}})^2)
+  \sigma_1 \\
+  &\times
+  \frac{1}{(\sigma_2^2)^{\frac{n}{2} + 1}} \exp \left( - \frac{1}{2\sigma_2^2} S_2 \right) 
+  \mathcal{N}(\bar{y}, (\frac{\sigma_2}{\sqrt{n}})^2)
+  \sigma_2 \\
+  &=
+  \frac{1}{(\sigma_1^2)^{\frac{m - 1}{2} + 1}} \exp \left( - \frac{1}{2\sigma_1^2} S_1 \right) 
+  \mathcal{N}(\bar{x}, (\frac{\sigma_1}{\sqrt{m}})^2) \\
+  &\times
+  \frac{1}{(\sigma_2^2)^{\frac{n - 1}{2} + 1}} \exp \left( - \frac{1}{2\sigma_2^2} S_2 \right) 
+  \mathcal{N}(\bar{y}, (\frac{\sigma_2}{\sqrt{n}})^2) \\
+\end{aligned}
+$$
+
+[^1]: https://www2.stat.duke.edu/courses/Spring16/sta643/slides/bayes-BF.pdf
+
+このとき、
+
+$$
+\begin{aligned}
+  g(\mu_1, \sigma_1^2|x) 
+  &= \frac{1}{(\sigma_1^2)^{\frac{m - 1}{2} + 1}} \exp \left( - \frac{1}{2\sigma_1^2} S_1 \right) \mathcal{N}(\bar{x}, (\frac{\sigma_1}{\sqrt{m}})^2) \\
+  g(\mu_2, \sigma_2^2|y) 
+  &= \frac{1}{(\sigma_2^2)^{\frac{n - 1}{2} + 1}} \exp \left( - \frac{1}{2\sigma_2^2} S_2 \right) \mathcal{N}(\bar{y}, (\frac{\sigma_2}{\sqrt{n}})^2) \\
+\end{aligned}
+$$
+
+としたとき、
+
+$$
+g(\mu_1, \sigma_1^2, \mu_2, \sigma_2^2|x,y) \propto g(\mu_1, \sigma_1^2|x) g(\mu_2, \sigma_2^2|y) 
+$$
+
+となり、互いに独立した事後分布に従う．
+
+### (b)
+
+互いに独立しているので、それぞれの分布からサンプリングすれば良く、次のようになる[^2]．
+
+[^2]: https://www.cs.ubc.ca/~schmidtm/Courses/540-W18/L20.pdf
+
+$$
+\begin{aligned}
+  \frac{\sigma_1^2}{S_1} &\sim InvChiSquare(m-1) \\
+  \mu_1 &\sim \mathcal{N}(\bar{x}, (\frac{\sigma_1}{\sqrt{m}})^2) \\ 
+  \frac{\sigma_2^2}{S_2} &\sim InvChiSquare(n-1) \\
+  \mu_2 &\sim \mathcal{N}(\bar{y}, (\frac{\sigma_2}{\sqrt{m}})^2) \\ 
+\end{aligned}
+$$
+
+### (c)
+
+
+
+
 
 
