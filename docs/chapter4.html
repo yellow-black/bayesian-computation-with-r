@@ -559,6 +559,71 @@ quantile(mu_2, c(0.05, 0.95))</code></pre>
 <p><img src="chapter4_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
 </div>
 </div>
+<div id="section-2" class="section level2">
+<h2>4-3</h2>
+<p><span class="math display">\[
+\begin{aligned}
+  n_N &amp;= 1601 + 162527 \\
+  y_N &amp;= 1601 \\
+  n_S &amp;= 510 + 412368 \\
+  y_S &amp;= 510 \\
+  y_N &amp;\perp y_S \\
+  y_N &amp;\sim Bin(n_N, p_N) \\ 
+  y_S &amp;\sim Bin(n_S, p_S) \\ 
+  p_N, p_S &amp;\sim Uniform(-\infty, \infty) \\
+\end{aligned}
+\]</span></p>
+<div id="a-2" class="section level3">
+<h3>(a)</h3>
+<p><span class="math display">\[
+\begin{aligned}
+  p(p_N, p_S|y_N, y_S) 
+  &amp;= \frac{p(y_N, y_S|p_N, p_S)p(p_N, p_S)}{p(y_N, y_S)} \\
+  &amp;= \frac{p(y_N, y_S|p_N, p_S) \cdot 1}{p(y_N, y_S)} \\
+  &amp;\propto p(y_N, y_S|p_N, p_S) \\
+  &amp;= p(y_N|p_N)p(y_S|p_S) \\
+  &amp;\propto p(y_N|p_N)p(y_S|p_S) \\
+  &amp;\propto p_N^{y_N}(1 - p_N)^{n_N-y_N} p_S^{y_S}(1 - p_S)^{n_S-y_S} \\
+  &amp;\propto Beta(p_N|y_N+1, n_N-y_N+1)Beta(p_S|y_S+1, n_S-y_S+1)
+\end{aligned}
+\]</span></p>
+<p>よって、</p>
+<p><span class="math display">\[
+\begin{aligned}
+  p_N &amp;\sim Beta(p_N|y_N+1, n_N-y_N+1) \\
+  p_S &amp;\sim Beta(p_S|y_S+1, n_S-y_S+1)
+\end{aligned}
+\]</span></p>
+</div>
+<div id="b-2" class="section level3">
+<h3>(b)</h3>
+<pre class="r"><code>n_N = 1601 + 162527
+y_N = 1601
+n_S = 510 + 412368
+y_S = 510
+sample_size = 10000
+p_N = rbeta(sample_size, y_N + 1, n_N - y_N + 1)
+p_S = rbeta(sample_size, y_S + 1, n_S - y_S + 1)</code></pre>
+</div>
+<div id="c-2" class="section level3">
+<h3>(c)</h3>
+<pre class="r"><code>hist(p_N/p_S)</code></pre>
+<p><img src="chapter4_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<pre class="r"><code>quantile(p_N/p_S, c(0.025, 0.975))</code></pre>
+<pre><code>##     2.5%    97.5% 
+## 7.142733 8.736755</code></pre>
+</div>
+<div id="d" class="section level3">
+<h3>(d)</h3>
+<pre class="r"><code>hist(p_N - p_S)</code></pre>
+<p><img src="chapter4_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+</div>
+<div id="e" class="section level3">
+<h3>(e)</h3>
+<pre class="r"><code>sum((p_N - p_S) &gt; 0) / sample_size</code></pre>
+<pre><code>## [1] 1</code></pre>
+</div>
+</div>
 <div class="footnotes">
 <hr />
 <ol>

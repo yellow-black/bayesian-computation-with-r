@@ -309,6 +309,74 @@ quantile(sqrt(sigma2_2), c(0.05, 0.95))
 hist(mu_1 - mu_2)
 ```
 
+## 4-3
 
+$$
+\begin{aligned}
+  n_N &= 1601 + 162527 \\
+  y_N &= 1601 \\
+  n_S &= 510 + 412368 \\
+  y_S &= 510 \\
+  y_N &\perp y_S \\
+  y_N &\sim Bin(n_N, p_N) \\ 
+  y_S &\sim Bin(n_S, p_S) \\ 
+  p_N, p_S &\sim Uniform(-\infty, \infty) \\
+\end{aligned}
+$$
+
+### (a)
+
+$$
+\begin{aligned}
+  p(p_N, p_S|y_N, y_S) 
+  &= \frac{p(y_N, y_S|p_N, p_S)p(p_N, p_S)}{p(y_N, y_S)} \\
+  &= \frac{p(y_N, y_S|p_N, p_S) \cdot 1}{p(y_N, y_S)} \\
+  &\propto p(y_N, y_S|p_N, p_S) \\
+  &= p(y_N|p_N)p(y_S|p_S) \\
+  &\propto p(y_N|p_N)p(y_S|p_S) \\
+  &\propto p_N^{y_N}(1 - p_N)^{n_N-y_N} p_S^{y_S}(1 - p_S)^{n_S-y_S} \\
+  &\propto Beta(p_N|y_N+1, n_N-y_N+1)Beta(p_S|y_S+1, n_S-y_S+1)
+\end{aligned}
+$$
+
+よって、
+
+$$
+\begin{aligned}
+  p_N &\sim Beta(p_N|y_N+1, n_N-y_N+1) \\
+  p_S &\sim Beta(p_S|y_S+1, n_S-y_S+1)
+\end{aligned}
+$$
+
+### (b)
+
+```{r}
+n_N = 1601 + 162527
+y_N = 1601
+n_S = 510 + 412368
+y_S = 510
+sample_size = 10000
+p_N = rbeta(sample_size, y_N + 1, n_N - y_N + 1)
+p_S = rbeta(sample_size, y_S + 1, n_S - y_S + 1)
+```
+
+### (c)
+
+```{r}
+hist(p_N/p_S)
+quantile(p_N/p_S, c(0.025, 0.975))
+```
+
+### (d)
+
+```{r}
+hist(p_N - p_S)
+```
+
+### (e)
+
+```{r}
+sum((p_N - p_S) > 0) / sample_size
+```
 
 
