@@ -532,6 +532,31 @@ g(\mu_1, \sigma_1^2, \mu_2, \sigma_2^2|x,y) \propto g(\mu_1, \sigma_1^2|x) g(\mu
 </div>
 <div id="c-1" class="section level3">
 <h3>(c)</h3>
+<pre class="r"><code>sample_size = 10000
+x = c(120, 107, 110, 116, 114, 111, 113, 117, 114, 112)
+S_1 = sum((x - mean(x))^2)
+m = length(x)
+sigma2_1 = S_1 * 1/rchisq(sample_size, m - 1)
+mu_1 = rnorm(sample_size, mean = mean(x), sd = sqrt(sigma2_1)/sqrt(m))
+quantile(mu_1, c(0.05, 0.95))</code></pre>
+<pre><code>##       5%      95% 
+## 111.2274 115.5527</code></pre>
+<pre class="r"><code>quantile(sqrt(sigma2_1), c(0.05, 0.95))</code></pre>
+<pre><code>##       5%      95% 
+## 2.720200 6.059221</code></pre>
+<pre class="r"><code>y = c(110, 111, 107, 108, 110, 105, 107, 106, 111, 111)
+S_2 = sum((y - mean(y))^2)
+n = length(y)
+sigma2_2 = S_2 * 1/rchisq(sample_size, n - 1)
+mu_2 = rnorm(sample_size, mean = mean(y), sd = sqrt(sigma2_2)/sqrt(n))
+quantile(mu_2, c(0.05, 0.95))</code></pre>
+<pre><code>##       5%      95% 
+## 107.2773 109.9402</code></pre>
+<pre class="r"><code>quantile(sqrt(sigma2_2), c(0.05, 0.95))</code></pre>
+<pre><code>##       5%      95% 
+## 1.652193 3.732908</code></pre>
+<pre class="r"><code>hist(mu_1 - mu_2)</code></pre>
+<p><img src="chapter4_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
 </div>
 </div>
 <div class="footnotes">
