@@ -1,5 +1,5 @@
 ---
-title: "chapter3"
+title: "chapter4"
 author: "s-takano"
 ---
 
@@ -378,5 +378,240 @@ hist(p_N - p_S)
 ```{r}
 sum((p_N - p_S) > 0) / sample_size
 ```
+
+## 4-4
+
+### (a)
+
+4-1 と同様な計算により、
+
+$$
+\begin{aligned}
+  \frac{\sigma^2}{S} &\sim InvChiSquare(n-1) \\
+  \mu &\sim \mathcal{N}(\bar{y}, (\frac{\sigma}{\sqrt{n}})^2) \\ 
+\end{aligned}
+$$
+
+```{r}
+sample_size = 1000
+y = c(10, 11, 12, 11, 9)
+S = sum((y - mean(y))^2)
+n = length(y)
+sigma2 = S * 1 / rchisq(sample_size, n - 1)
+mu = rnorm(sample_size, mean = mean(y), sd = sqrt(sigma2)/sqrt(n))
+length(mu)
+length(sigma2)
+```
+
+```{r}
+mean(mu)
+mean(sigma2)
+```
+
+### (b)
+
+丸められる前の観測値を $z_n$ とする．
+
+$$
+z_1, z_2, \ldots, z_{5} \sim \mathcal{N}(\mu, \sigma^2)
+$$
+
+このとき、丸められた測定値は以下のように表せる．
+
+$$
+y_n \in (z_n - \frac{1}{2}, z_n + \frac{1}{2})
+$$
+
+このとき、$y$ の確率質量関数は、丸められる前の観測値 $z_n$ を周辺化することで以下のように表せる．
+
+$$
+\begin{aligned}
+  p(y_n|\mu, \sigma^2) 
+  &= \int_{y_n-\frac{1}{2}}^{y_n+\frac{1}{2}} \mathcal{N}(z_n|\mu, \sigma^2) dz_n \\
+  &= \Phi(\frac{y_n+\frac{1}{2} - \mu}{\sigma}) - \Phi(\frac{y_n-\frac{1}{2} - \mu}{\sigma})
+\end{aligned}
+$$
+
+ここで、$\Phi$ は標準正規分布の累積確率分布である．
+無情報事前分布として、
+
+$$
+p(\mu, \sigma^2) \propto \frac{1}{\sigma^2}
+$$
+
+とする．
+よって、事後分布は次のように表せる[^3]．
+
+[^3]: https://mc-stan.org/docs/2_23/stan-users-guide/bayesian-measurement-error-model.html
+
+$$
+\begin{aligned}
+  p(\mu, \sigma^2|y) 
+  &\propto p(\mathbb{y}|\mu, \sigma^2) p(\mu, \sigma^2) \\
+  &\propto \prod_{n=1}^{N} p(y_n|\mu, \sigma^2) \frac{1}{\sigma^2} \\
+  &= \frac{1}{\sigma^2} \prod_{n=1}^{N} \left( \Phi(\frac{y_n+\frac{1}{2} - \mu}{\sigma}) - \Phi(\frac{y_n-\frac{1}{2} - \mu}{\sigma}) \right)
+\end{aligned}
+$$
+
+### (c)
+
+まず、対数をとった事後分布を導出する．
+
+$$
+\begin{aligned}
+  \ln p(\mu, \sigma^2|y)
+  &= \ln \frac{1}{\sigma^2} \prod_{n=1}^{N} \left( \Phi(\frac{y_n+\frac{1}{2} - \mu}{\sigma}) - \Phi(\frac{y_n-\frac{1}{2} - \mu}{\sigma}) \right) \\
+  &= \sum_{n=1}^{N} \ln \left( \Phi(\frac{y_n+\frac{1}{2} - \mu}{\sigma}) - \Phi(\frac{y_n-\frac{1}{2} - \mu}{\sigma}) \right) - \ln \sigma^2
+\end{aligned}
+$$
+
+```{r}
+y
+```
+
+上記の結果から、以下のようなグリッドを用意する[^4]．
+
+[^4]: *Bayesian Data Analysis*. Third Edition. (p.76)
+
+```{r}
+N = length(y)
+
+p = function (mu, sigma2, y) {
+  return(
+    sum(
+      log(
+        pnorm((y + 1/2 - mu) / sqrt(sigma2)) - pnorm((y - 1/2 - mu) / sqrt(sigma2))
+      )
+    ) 
+    - 
+    log(sigma2)
+  )
+}
+
+ng = 50 # num of grids
+mu = seq(5, 20, len = ng)
+dmu = diff(mu[1:2])
+sigma2 = seq(0.1, 5, len = ng)
+dsigma2 = diff(sigma2[1:2])
+
+probs = matrix(nrow = ng, ncol = ng)
+for (i in 1:ng) {
+  for (j in 1:ng) {
+    probs[i, j] = p(mu[i], sigma2[j], y)
+  }
+}
+probs = probs - max(probs)
+probs = exp(probs)
+probs = probs / sum(probs)
+marginal_prob = rowSums(probs) # p(mu|y)
+
+sample_size = 1000
+mu_sample = c()
+sigma2_sample = c()
+for (n in 1:sample_size) {
+  i = sample(1:ng, 1, replace=TRUE, prob = marginal_prob)
+  mu_sample = c(mu_sample, mu[i] + runif(1) * dmu - dmu / 2) 
+  j = sample(1:ng, 1, replace=TRUE, prob = probs[i,]) # p(sigma^2|mu, y)
+  sigma2_sample = c(sigma2_sample, sigma2[j] + runif(1) * dsigma2 - dsigma2 / 2)
+}
+mean(mu_sample)
+mean(sigma2_sample)
+```
+
+LearnBayes を用いてみる．
+
+```{r, error=FALSE}
+p = function (theta, data) {
+  mu = theta[1]
+  sigma2 = theta[2]
+  return(
+    sum(
+      log(
+        pnorm((data + 1/2 - mu) / sqrt(sigma2)) - pnorm((y - 1/2 - mu) / sqrt(sigma2))
+      )
+    ) 
+    - 
+    log(sigma2)
+  )
+}
+s = simcontour(p, c(5, 20, 0.1, 5), y, 1000)
+mean(s$x)
+mean(s$y)
+```
+
+Stan を用いてみる．
+
+```{r echo=FALSE}
+library(rstan)
+options(mc.cores = parallel::detectCores())
+rstan_options(auto_write = TRUE)
+```
+
+```{stan, output.var="model", echo=FALSE}
+data {
+  int<lower=0> N;
+  vector[N] y;
+}
+
+parameters {
+  real mu;
+  real<lower=0> sigma_sq;
+}
+
+transformed parameters {
+  real<lower=0> sigma;
+  sigma = sqrt(sigma_sq);
+}
+
+model {
+  target += -2 * log(sigma);
+  for (n in 1:N)
+    target += log(Phi((y[n] + 0.5 - mu) / sigma)
+                  - Phi((y[n] - 0.5 - mu) / sigma));
+}
+
+```
+
+```{r, echo=FALSE}
+fit = sampling(model, data = list(N = 5, y = y))
+```
+
+```{r}
+sample = extract(fit)
+mean(sample$mu)
+mean(sample$sigma)
+```
+
+### (d)
+
+(a) の結果は以下のようになる．
+
+```
+[1] 10.61258
+[1] 2.818481
+```
+
+(c) の結果は以下のようになる．
+
+```
+[1] 10.58333
+[1] 1.615329
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

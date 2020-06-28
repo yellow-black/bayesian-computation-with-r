@@ -12,7 +12,7 @@
 <meta name="author" content="s-takano" />
 
 
-<title>chapter3</title>
+<title>chapter4</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -287,7 +287,7 @@ $(document).ready(function () {
 
 
 
-<h1 class="title toc-ignore">chapter3</h1>
+<h1 class="title toc-ignore">chapter4</h1>
 <h4 class="author">s-takano</h4>
 
 </div>
@@ -624,11 +624,168 @@ p_S = rbeta(sample_size, y_S + 1, n_S - y_S + 1)</code></pre>
 <pre><code>## [1] 1</code></pre>
 </div>
 </div>
+<div id="section-3" class="section level2">
+<h2>4-4</h2>
+<div id="a-3" class="section level3">
+<h3>(a)</h3>
+<p>4-1 と同様な計算により、</p>
+<p><span class="math display">\[
+\begin{aligned}
+  \frac{\sigma^2}{S} &amp;\sim InvChiSquare(n-1) \\
+  \mu &amp;\sim \mathcal{N}(\bar{y}, (\frac{\sigma}{\sqrt{n}})^2) \\ 
+\end{aligned}
+\]</span></p>
+<pre class="r"><code>sample_size = 1000
+y = c(10, 11, 12, 11, 9)
+S = sum((y - mean(y))^2)
+n = length(y)
+sigma2 = S * 1 / rchisq(sample_size, n - 1)
+mu = rnorm(sample_size, mean = mean(y), sd = sqrt(sigma2)/sqrt(n))
+length(mu)</code></pre>
+<pre><code>## [1] 1000</code></pre>
+<pre class="r"><code>length(sigma2)</code></pre>
+<pre><code>## [1] 1000</code></pre>
+<pre class="r"><code>mean(mu)</code></pre>
+<pre><code>## [1] 10.5626</code></pre>
+<pre class="r"><code>mean(sigma2)</code></pre>
+<pre><code>## [1] 2.619525</code></pre>
+</div>
+<div id="b-3" class="section level3">
+<h3>(b)</h3>
+<p>丸められる前の観測値を <span class="math inline">\(z_n\)</span> とする．</p>
+<p><span class="math display">\[
+z_1, z_2, \ldots, z_{5} \sim \mathcal{N}(\mu, \sigma^2)
+\]</span></p>
+<p>このとき、丸められた測定値は以下のように表せる．</p>
+<p><span class="math display">\[
+y_n \in (z_n - \frac{1}{2}, z_n + \frac{1}{2})
+\]</span></p>
+<p>このとき、<span class="math inline">\(y\)</span> の確率質量関数は、丸められる前の観測値 <span class="math inline">\(z_n\)</span> を周辺化することで以下のように表せる．</p>
+<p><span class="math display">\[
+\begin{aligned}
+  p(y_n|\mu, \sigma^2) 
+  &amp;= \int_{y_n-\frac{1}{2}}^{y_n+\frac{1}{2}} \mathcal{N}(z_n|\mu, \sigma^2) dz_n \\
+  &amp;= \Phi(\frac{y_n+\frac{1}{2} - \mu}{\sigma}) - \Phi(\frac{y_n-\frac{1}{2} - \mu}{\sigma})
+\end{aligned}
+\]</span></p>
+<p>ここで、<span class="math inline">\(\Phi\)</span> は標準正規分布の累積確率分布である． 無情報事前分布として、</p>
+<p><span class="math display">\[
+p(\mu, \sigma^2) \propto \frac{1}{\sigma^2}
+\]</span></p>
+<p>とする． よって、事後分布は次のように表せる<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a>．</p>
+<p><span class="math display">\[
+\begin{aligned}
+  p(\mu, \sigma^2|y) 
+  &amp;\propto p(\mathbb{y}|\mu, \sigma^2) p(\mu, \sigma^2) \\
+  &amp;\propto \prod_{n=1}^{N} p(y_n|\mu, \sigma^2) \frac{1}{\sigma^2} \\
+  &amp;= \frac{1}{\sigma^2} \prod_{n=1}^{N} \left( \Phi(\frac{y_n+\frac{1}{2} - \mu}{\sigma}) - \Phi(\frac{y_n-\frac{1}{2} - \mu}{\sigma}) \right)
+\end{aligned}
+\]</span></p>
+</div>
+<div id="c-3" class="section level3">
+<h3>(c)</h3>
+<p>まず、対数をとった事後分布を導出する．</p>
+<p><span class="math display">\[
+\begin{aligned}
+  \ln p(\mu, \sigma^2|y)
+  &amp;= \ln \frac{1}{\sigma^2} \prod_{n=1}^{N} \left( \Phi(\frac{y_n+\frac{1}{2} - \mu}{\sigma}) - \Phi(\frac{y_n-\frac{1}{2} - \mu}{\sigma}) \right) \\
+  &amp;= \sum_{n=1}^{N} \ln \left( \Phi(\frac{y_n+\frac{1}{2} - \mu}{\sigma}) - \Phi(\frac{y_n-\frac{1}{2} - \mu}{\sigma}) \right) - \ln \sigma^2
+\end{aligned}
+\]</span></p>
+<pre class="r"><code>y</code></pre>
+<pre><code>## [1] 10 11 12 11  9</code></pre>
+<p>上記の結果から、以下のようなグリッドを用意する<a href="#fn4" class="footnote-ref" id="fnref4"><sup>4</sup></a>．</p>
+<pre class="r"><code>N = length(y)
+
+p = function (mu, sigma2, y) {
+  return(
+    sum(
+      log(
+        pnorm((y + 1/2 - mu) / sqrt(sigma2)) - pnorm((y - 1/2 - mu) / sqrt(sigma2))
+      )
+    ) 
+    - 
+    log(sigma2)
+  )
+}
+
+ng = 50 # num of grids
+mu = seq(5, 20, len = ng)
+dmu = diff(mu[1:2])
+sigma2 = seq(0.1, 5, len = ng)
+dsigma2 = diff(sigma2[1:2])
+
+probs = matrix(nrow = ng, ncol = ng)
+for (i in 1:ng) {
+  for (j in 1:ng) {
+    probs[i, j] = p(mu[i], sigma2[j], y)
+  }
+}
+probs = probs - max(probs)
+probs = exp(probs)
+probs = probs / sum(probs)
+marginal_prob = rowSums(probs) # p(mu|y)
+
+sample_size = 1000
+mu_sample = c()
+sigma2_sample = c()
+for (n in 1:sample_size) {
+  i = sample(1:ng, 1, replace=TRUE, prob = marginal_prob)
+  mu_sample = c(mu_sample, mu[i] + runif(1) * dmu - dmu / 2) 
+  j = sample(1:ng, 1, replace=TRUE, prob = probs[i,]) # p(sigma^2|mu, y)
+  sigma2_sample = c(sigma2_sample, sigma2[j] + runif(1) * dsigma2 - dsigma2 / 2)
+}
+mean(mu_sample)</code></pre>
+<pre><code>## [1] 10.59278</code></pre>
+<pre class="r"><code>mean(sigma2_sample)</code></pre>
+<pre><code>## [1] 1.621955</code></pre>
+<p>LearnBayes を用いてみる．</p>
+<pre class="r"><code>p = function (theta, data) {
+  mu = theta[1]
+  sigma2 = theta[2]
+  return(
+    sum(
+      log(
+        pnorm((data + 1/2 - mu) / sqrt(sigma2)) - pnorm((y - 1/2 - mu) / sqrt(sigma2))
+      )
+    ) 
+    - 
+    log(sigma2)
+  )
+}
+s = simcontour(p, c(5, 20, 0.1, 5), y, 1000)
+mean(s$x)</code></pre>
+<pre><code>## [1] 10.59801</code></pre>
+<pre class="r"><code>mean(s$y)</code></pre>
+<pre><code>## [1] 1.648196</code></pre>
+<p>Stan を用いてみる．</p>
+<pre class="r"><code>sample = extract(fit)
+mean(sample$mu)</code></pre>
+<pre><code>## [1] 10.5802</code></pre>
+<pre class="r"><code>mean(sample$sigma)</code></pre>
+<pre><code>## [1] 1.362632</code></pre>
+</div>
+<div id="d-1" class="section level3">
+<h3>(d)</h3>
+<ol style="list-style-type: lower-alpha">
+<li>の結果は以下のようになる．</li>
+</ol>
+<pre><code>[1] 10.61258
+[1] 2.818481</code></pre>
+<ol start="3" style="list-style-type: lower-alpha">
+<li>の結果は以下のようになる．</li>
+</ol>
+<pre><code>[1] 10.58333
+[1] 1.615329</code></pre>
+</div>
+</div>
 <div class="footnotes">
 <hr />
 <ol>
 <li id="fn1"><p><a href="https://www2.stat.duke.edu/courses/Spring16/sta643/slides/bayes-BF.pdf" class="uri">https://www2.stat.duke.edu/courses/Spring16/sta643/slides/bayes-BF.pdf</a><a href="#fnref1" class="footnote-back">↩</a></p></li>
 <li id="fn2"><p><a href="https://www.cs.ubc.ca/~schmidtm/Courses/540-W18/L20.pdf" class="uri">https://www.cs.ubc.ca/~schmidtm/Courses/540-W18/L20.pdf</a><a href="#fnref2" class="footnote-back">↩</a></p></li>
+<li id="fn3"><p><a href="https://mc-stan.org/docs/2_23/stan-users-guide/bayesian-measurement-error-model.html" class="uri">https://mc-stan.org/docs/2_23/stan-users-guide/bayesian-measurement-error-model.html</a><a href="#fnref3" class="footnote-back">↩</a></p></li>
+<li id="fn4"><p><em>Bayesian Data Analysis</em>. Third Edition. (p.76)<a href="#fnref4" class="footnote-back">↩</a></p></li>
 </ol>
 </div>
 
