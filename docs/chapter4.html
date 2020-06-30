@@ -779,6 +779,242 @@ mean(sample$mu)</code></pre>
 [1] 1.615329</code></pre>
 </div>
 </div>
+<div id="section-4" class="section level2">
+<h2>4-5</h2>
+<p><span class="math display">\[
+y_1, \ldots, y_n \sim f(y|a,b) 
+\]</span></p>
+<p><span class="math display">\[
+f(y|a,b) = \frac{\Gamma(y + a)}{\Gamma(a)y!}\frac{b^a}{(b + 1)^{y+a}} \quad (a, b &gt; 0)
+\]</span></p>
+<p>上記の式の導出を試みる． まず、ポアソン分布は以下のようにかける．</p>
+<p><span class="math display">\[
+Po(y|\lambda) \sim \frac{1}{y!} \lambda^y \exp(-\lambda)
+\]</span></p>
+<p>次に、ガンマ分布は以下のようにかける．</p>
+<p><span class="math display">\[
+Gamma(y|a, b) = \frac{b^a}{\Gamma(a)} y^{a-1} \exp(-by)
+\]</span></p>
+<p>よって、ポアソン・ガンマの混合は次のようにかける．</p>
+<p><span class="math display">\[
+\begin{aligned}
+  \lambda &amp;\sim Gamma(\lambda|a,b) \\
+  y &amp;\sim Po(y|\lambda) 
+\end{aligned}
+\]</span></p>
+<p><span class="math display">\[
+\begin{aligned}
+  p(y|a,b) 
+  &amp;= \int Po(y|\lambda) Gamma(\lambda|a,b) \; d\lambda \\
+  &amp;= \int \frac{1}{y!} \lambda^y \exp(-\lambda) \frac{b^a}{\Gamma(a)} \lambda^{a-1} \exp(-b\lambda) \; d\lambda \\
+  &amp;= \frac{1}{y!} \frac{b^a}{\Gamma(a)} \int \lambda^y  \exp(-\lambda) \lambda^{a-1} \exp(-b\lambda) \; d\lambda \\
+  &amp;= \frac{1}{y!} \frac{b^a}{\Gamma(a)} \int \lambda^{y + a - 1} \exp(-(b+1)\lambda) \; d\lambda \\
+  &amp;= \frac{1}{y!} \frac{b^a}{\Gamma(a)} \frac{\Gamma(y + a)}{(b + 1)^{(y + a)}} \\
+  &amp;= \frac{\Gamma(y + a)}{\Gamma(a)y!}\frac{b^a}{(b + 1)^{y+a}}
+\end{aligned}
+\]</span></p>
+<p>事前分布を以下とすると、</p>
+<p><span class="math display">\[
+p(a,b) \propto \frac{1}{(ab)^2}
+\]</span></p>
+<p><span class="math display">\[
+\begin{aligned}
+  p(\theta_1, \theta_2|data) 
+  &amp;\propto \frac{1}{ab} \prod_{i=1}^n \frac{\Gamma(y_i + a)}{\Gamma(a) y_i!}\frac{b^a}{(b + 1)^{y_i+a}} \\
+  a &amp;= \exp(\theta_1), \\
+  b &amp;= \exp(\theta_2)
+\end{aligned}
+\]</span></p>
+<pre class="r"><code>y = c(2, 5, 0, 2, 3, 1, 3, 4, 3, 0, 3, 
+      2, 1, 1, 0, 6, 0, 0, 3, 0, 1, 1,
+      5, 0, 1, 2, 0, 0, 2, 1, 1, 1, 0)
+
+n = length(y)</code></pre>
+<p>グリッド範囲を決定するため、最尤推定を行う．</p>
+<p><span class="math display">\[
+\begin{aligned}
+  L(a, b) 
+  &amp;= \sum_{i=1}^n \log \frac{\Gamma(y_i + a)}{\Gamma(a) y_i!}\frac{b^a}{(b + 1)^{y_i + a}} \\
+  &amp;= \sum_{i=1}^n \log \Gamma(y_i + a) - \log \Gamma(a) - \log y_i! + a \log b - (y_i + a)\log (b + 1) \\
+\end{aligned}
+\]</span></p>
+<p>よって、</p>
+<p><span class="math display">\[
+\begin{aligned}
+  \underset{a,b}{\operatorname{argmax}} {L(a,b)} 
+  &amp;= \underset{a,b}{\operatorname{argmax}} {\sum_{i=1}^n \log \Gamma(y_i + a) - \log \Gamma(a) - \log y_i! + a \log b - (y_i + a)\log (b + 1)} \\
+  &amp;= \underset{a,b}{\operatorname{argmax}} {\sum_{i=1}^n \log \Gamma(y_i + a) - \log \Gamma(a) + a \log b - (y_i + a)\log (b + 1)} \\
+\end{aligned}
+\]</span></p>
+<p><span class="math display">\[
+\begin{aligned}
+  \frac{\partial L}{\partial a} 
+  &amp;= \frac{\partial}{\partial a} \sum_{i=1}^n \log \Gamma(y_i + a) - \log \Gamma(a) - \log y_i! + a \log b - (y_i + a)\log (b + 1) \\
+  &amp;= \sum_{i=1}^n \psi(y_i + a) - \psi(a) + \log b - \log (b + 1) \\
+\end{aligned}
+\]</span></p>
+<p>ここで、<span class="math inline">\(\psi\)</span> はディガンマ関数である．ディガンマ関数の性質<a href="#fn5" class="footnote-ref" id="fnref5"><sup>5</sup></a>より、</p>
+<p><span class="math display">\[
+\begin{aligned}
+  \frac{\partial L}{\partial a} 
+  &amp;= \sum_{i=1}^n \psi(y_i + a) - \psi(a) + \log b - \log (b + 1) \\
+  &amp;= \sum_{i=1}^n \sum_{k=1}^{y_i}{\frac{1}{a+k-1}} + \log b - \log (b + 1) \\
+  &amp;= \sum_{i=1}^n \left( \sum_{k=1}^{y_i}{\frac{1}{a+k-1}} + \log b - \log (b + 1) \right) \\
+  &amp;= \sum_{i=1}^n \left( \sum_{k=1}^{y_i}{\frac{1}{a+k-1}} \right) + n \log\frac{b}{b+1} \\
+\end{aligned}
+\]</span></p>
+<p><span class="math display">\[
+\begin{aligned}
+  \frac{\partial L}{\partial b} 
+  &amp;= \frac{\partial}{\partial b} \sum_{i=1}^n \log \Gamma(y_i + a) - \log \Gamma(a) - \log y_i! + a \log b - (y_i + a)\log (b + 1) \\
+  &amp;= \sum_{i=1}^n a \frac{1}{b} - (y_i + a) \frac{1}{b + 1} \\
+  &amp;= \sum_{i=1}^n \frac{a}{b} - \frac{y_i + a}{b + 1} \\
+  &amp;= n \frac{a}{b} - n \frac{a}{b + 1} - \sum_{i=1}^n \frac{y_i}{b + 1} \\
+\end{aligned}
+\]</span></p>
+<p><span class="math inline">\(\frac{\partial L}{\partial a} = \frac{\partial L}{\partial b} = 0\)</span> の解が解析的には求まりそうにないので、数値計算法を用いる．</p>
+<pre class="r"><code>LL = function (x) {
+  a = x[1]
+  b = x[2]
+  return(
+    sum(lgamma(y + a) - lgamma(a) + a * log(b) - (y + a) * log(b + 1))
+  )
+}
+mle = optim(c(0.01, 0.01), LL, control = list(fnscale = -1))
+mle</code></pre>
+<pre><code>## $par
+## [1] 2.231517 1.363840
+## 
+## $value
+## [1] -25.00415
+## 
+## $counts
+## function gradient 
+##      119       NA 
+## 
+## $convergence
+## [1] 0
+## 
+## $message
+## NULL</code></pre>
+<p>エラーが出ているが収束しているので無視．</p>
+<pre class="r"><code>logp = function (theta_1, theta_2, y) {
+  a = exp(theta_1)
+  b = exp(theta_2)
+  return(
+    sum(lgamma(y + a) - lgamma(a) + a * log(b) - (y + a) * log(b + 1)) - log(a) - log(b) 
+  )
+}
+
+n_grid = 2500
+theta_1 = seq(0.1, log(mle$par)[1] * 2, length.out = n_grid)
+dtheta_1 = diff(theta_1[1:2])
+theta_2 = seq(0.1, log(mle$par)[2] * 2, length.out = n_grid)
+dtheta_2 = diff(theta_2[1:2])
+
+probs = matrix(nrow = n_grid, ncol = n_grid)
+for (i in 1:n_grid) {
+  for (j in 1:n_grid) {
+    probs[i, j] = logp(theta_1[i], theta_2[j], y)
+  }
+}
+probs = exp(probs)
+probs = probs / sum(probs)
+marginal_prob = rowSums(probs) # p(theta_1|y)
+
+sample_size = 1000
+theta_1_sample = c()
+theta_2_sample = c()
+for (n in 1:sample_size) {
+  i = sample(1:n_grid, 1, replace=TRUE, prob = marginal_prob)
+  theta_1_sample = c(theta_1_sample, theta_1[i] + runif(1) * dtheta_1 - dtheta_1 / 2) 
+  j = sample(1:n_grid, 1, replace=TRUE, prob = probs[i,]) # p(theta_2|theta_1, y)
+  theta_2_sample = c(theta_2_sample, theta_2[j] + runif(1) * dtheta_2 - dtheta_2 / 2)
+}
+a = exp(theta_1_sample)
+b = exp(theta_2_sample)
+quantile(a, c(0.05, 0.95))</code></pre>
+<pre><code>##       5%      95% 
+## 1.500322 3.035253</code></pre>
+<pre class="r"><code>quantile(b, c(0.05, 0.95))</code></pre>
+<pre><code>##       5%      95% 
+## 1.121102 1.772769</code></pre>
+<p>LearnBayes を用いてみる．</p>
+<pre class="r"><code>logp = function (theta, y) {
+  a = exp(theta[1])
+  b = exp(theta[2])
+  return(
+    sum(lgamma(y + a) - lgamma(a) + a * log(b) - (y + a) * log(b + 1)) - log(a) - log(b) 
+  )
+}
+s = simcontour(logp, c(0.1, log(mle$par)[1] * 2, 0.1, log(mle$par)[2] * 2), y, 1000)
+quantile(exp(s$x), c(0.05, 0.95))</code></pre>
+<pre><code>##       5%      95% 
+## 1.448474 3.063377</code></pre>
+<pre class="r"><code>quantile(exp(s$y), c(0.05, 0.95))</code></pre>
+<pre><code>##       5%      95% 
+## 1.116856 1.774916</code></pre>
+<p>Stan を用いてみる． その際に、扱いやすい負の二項分布とする<a href="#fn6" class="footnote-ref" id="fnref6"><sup>6</sup></a>．</p>
+<p><span class="math display">\[
+\begin{aligned}
+  p(y|a,b)
+  &amp;= \frac{\Gamma(y + a)}{\Gamma(a)y!}\frac{b^a}{(b + 1)^{y+a}} \\
+  &amp;= \frac{\Gamma(y + a)}{\Gamma(a)y!} \left( \frac{b}{b + 1} \right)^a \left( \frac{1}{b + 1} \right)^y \\  
+  &amp;= \frac{\Gamma(y + a)}{\Gamma(a)y!} \left( \frac{b}{b + 1} \right)^a \left( 1 - \frac{b}{b + 1} \right)^y \\
+\end{aligned}
+\]</span></p>
+<pre class="r"><code>fit</code></pre>
+<pre><code>## Inference for Stan model: e625dc1d166f9a9d4fa9c4dcf543c6f8.
+## 4 chains, each with iter=2000; warmup=1000; thin=1; 
+## post-warmup draws per chain=1000, total post-warmup draws=4000.
+## 
+##           mean se_mean   sd   2.5%    25%    50%    75%  97.5% n_eff Rhat
+## theta_1   0.18    0.02 0.52  -0.76  -0.19   0.14   0.49   1.27   809    1
+## theta_2  -0.37    0.02 0.59  -1.50  -0.75  -0.38   0.00   0.83   846    1
+## a         1.39    0.03 0.94   0.47   0.83   1.15   1.64   3.58   814    1
+## b         0.83    0.02 0.61   0.22   0.47   0.68   1.00   2.28   818    1
+## lp__    -58.23    0.03 1.05 -61.05 -58.66 -57.91 -57.47 -57.19   972    1
+## 
+## Samples were drawn using NUTS(diag_e) at Wed Jul  1 08:41:20 2020.
+## For each parameter, n_eff is a crude measure of effective sample size,
+## and Rhat is the potential scale reduction factor on split chains (at 
+## convergence, Rhat=1).</code></pre>
+<pre class="r"><code>rstan::traceplot(fit, pars = c(&quot;a&quot;, &quot;b&quot;))</code></pre>
+<p><img src="chapter4_files/figure-html/unnamed-chunk-27-1.png" width="672" /></p>
+<pre class="r"><code>sample = rstan::extract(fit)
+quantile(sample$a, c(0.05, 0.95))</code></pre>
+<pre><code>##        5%       95% 
+## 0.5440772 2.9220998</code></pre>
+<pre class="r"><code>quantile(sample$b, c(0.05, 0.95))</code></pre>
+<pre><code>##        5%       95% 
+## 0.2715782 1.8247837</code></pre>
+<p>グリッド近似と同様の尤度関数を用いて実行してみる．</p>
+<pre class="r"><code>fit</code></pre>
+<pre><code>## Inference for Stan model: 03501badcdaacac034135e387812747c.
+## 4 chains, each with iter=2000; warmup=1000; thin=1; 
+## post-warmup draws per chain=1000, total post-warmup draws=4000.
+## 
+##           mean se_mean   sd   2.5%    25%    50%    75%  97.5% n_eff Rhat
+## theta_1   0.23    0.02 0.57  -0.77  -0.16   0.19   0.57   1.46   644 1.00
+## theta_2  -0.32    0.02 0.63  -1.52  -0.73  -0.33   0.06   1.00   649 1.00
+## a         1.51    0.05 1.21   0.46   0.86   1.21   1.77   4.31   501 1.01
+## b         0.90    0.03 0.77   0.22   0.48   0.72   1.07   2.73   496 1.01
+## lp__    -26.50    0.04 1.11 -29.53 -26.91 -26.15 -25.72 -25.43   892 1.00
+## 
+## Samples were drawn using NUTS(diag_e) at Wed Jul  1 08:42:13 2020.
+## For each parameter, n_eff is a crude measure of effective sample size,
+## and Rhat is the potential scale reduction factor on split chains (at 
+## convergence, Rhat=1).</code></pre>
+<pre class="r"><code>rstan::traceplot(fit, pars = c(&quot;a&quot;, &quot;b&quot;))</code></pre>
+<p><img src="chapter4_files/figure-html/unnamed-chunk-32-1.png" width="672" /></p>
+<pre class="r"><code>sample = rstan::extract(fit)
+quantile(sample$a, c(0.05, 0.95))</code></pre>
+<pre><code>##        5%       95% 
+## 0.5323909 3.2379557</code></pre>
+<pre class="r"><code>quantile(sample$b, c(0.05, 0.95))</code></pre>
+<pre><code>##        5%       95% 
+## 0.2758367 2.0449512</code></pre>
+</div>
 <div class="footnotes">
 <hr />
 <ol>
@@ -786,6 +1022,8 @@ mean(sample$mu)</code></pre>
 <li id="fn2"><p><a href="https://www.cs.ubc.ca/~schmidtm/Courses/540-W18/L20.pdf" class="uri">https://www.cs.ubc.ca/~schmidtm/Courses/540-W18/L20.pdf</a><a href="#fnref2" class="footnote-back">↩</a></p></li>
 <li id="fn3"><p><a href="https://mc-stan.org/docs/2_23/stan-users-guide/bayesian-measurement-error-model.html" class="uri">https://mc-stan.org/docs/2_23/stan-users-guide/bayesian-measurement-error-model.html</a><a href="#fnref3" class="footnote-back">↩</a></p></li>
 <li id="fn4"><p><em>Bayesian Data Analysis</em>. Third Edition. (p.76)<a href="#fnref4" class="footnote-back">↩</a></p></li>
+<li id="fn5"><p><a href="https://ja.wikipedia.org/wiki/ディガンマ関数" class="uri">https://ja.wikipedia.org/wiki/ディガンマ関数</a><a href="#fnref5" class="footnote-back">↩</a></p></li>
+<li id="fn6"><p><a href="https://mc-stan.org/docs/2_19/functions-reference/negative-binomial-distribution.html" class="uri">https://mc-stan.org/docs/2_19/functions-reference/negative-binomial-distribution.html</a><a href="#fnref6" class="footnote-back">↩</a></p></li>
 </ol>
 </div>
 
