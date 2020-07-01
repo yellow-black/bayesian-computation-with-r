@@ -731,8 +731,6 @@ mle = optim(c(0.01, 0.01), LL, control = list(fnscale = -1))
 mle
 ```
 
-エラーが出ているが収束しているので無視．
-
 ```{r}
 logp = function (theta_1, theta_2, y) {
   a = exp(theta_1)
@@ -802,7 +800,7 @@ $$
 \end{aligned}
 $$
 
-```{stan, output.var="model", echo=FALSE}
+```{stan, output.var="model"}
 data {
   int<lower=0> N;
   int y[N];
@@ -848,7 +846,7 @@ quantile(sample$b, c(0.05, 0.95))
 
 グリッド近似と同様の尤度関数を用いて実行してみる．
 
-```{stan, output.var="model", echo=FALSE}
+```{stan, output.var="model"}
 data {
   int<lower=0> N;
   int y[N];

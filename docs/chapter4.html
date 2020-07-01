@@ -897,7 +897,6 @@ mle</code></pre>
 ## 
 ## $message
 ## NULL</code></pre>
-<p>エラーが出ているが収束しているので無視．</p>
 <pre class="r"><code>logp = function (theta_1, theta_2, y) {
   a = exp(theta_1)
   b = exp(theta_2)
@@ -963,6 +962,29 @@ quantile(exp(s$x), c(0.05, 0.95))</code></pre>
   &amp;= \frac{\Gamma(y + a)}{\Gamma(a)y!} \left( \frac{b}{b + 1} \right)^a \left( 1 - \frac{b}{b + 1} \right)^y \\
 \end{aligned}
 \]</span></p>
+<pre class="stan"><code>data {
+  int&lt;lower=0&gt; N;
+  int y[N];
+}
+
+parameters {
+  real theta_1;
+  real theta_2;
+}
+
+transformed parameters {
+  real&lt;lower=0&gt; a;
+  real&lt;lower=0&gt; b;
+  a = exp(theta_1);
+  b = exp(theta_2);
+}
+
+model {
+  target += -1 * (log(a) + log(b));
+  for (n in 1:N)
+    target += neg_binomial_lpmf(y[n]| a, b);
+}
+</code></pre>
 <pre class="r"><code>fit</code></pre>
 <pre><code>## Inference for Stan model: e625dc1d166f9a9d4fa9c4dcf543c6f8.
 ## 4 chains, each with iter=2000; warmup=1000; thin=1; 
@@ -975,7 +997,7 @@ quantile(exp(s$x), c(0.05, 0.95))</code></pre>
 ## b         0.83    0.02 0.61   0.22   0.47   0.68   1.00   2.28   818    1
 ## lp__    -58.23    0.03 1.05 -61.05 -58.66 -57.91 -57.47 -57.19   972    1
 ## 
-## Samples were drawn using NUTS(diag_e) at Wed Jul  1 08:41:20 2020.
+## Samples were drawn using NUTS(diag_e) at Wed Jul  1 08:53:50 2020.
 ## For each parameter, n_eff is a crude measure of effective sample size,
 ## and Rhat is the potential scale reduction factor on split chains (at 
 ## convergence, Rhat=1).</code></pre>
@@ -989,6 +1011,29 @@ quantile(sample$a, c(0.05, 0.95))</code></pre>
 <pre><code>##        5%       95% 
 ## 0.2715782 1.8247837</code></pre>
 <p>グリッド近似と同様の尤度関数を用いて実行してみる．</p>
+<pre class="stan"><code>data {
+  int&lt;lower=0&gt; N;
+  int y[N];
+}
+
+parameters {
+  real theta_1;
+  real theta_2;
+}
+
+transformed parameters {
+  real&lt;lower=0&gt; a;
+  real&lt;lower=0&gt; b;
+  a = exp(theta_1);
+  b = exp(theta_2);
+}
+
+model {
+  target += -1 * (log(a) + log(b));
+  for (n in 1:N)
+    target += lgamma(y[n] + a) - lgamma(a) + a * log(b) - (y[n] + a) * log(b + 1);
+}
+</code></pre>
 <pre class="r"><code>fit</code></pre>
 <pre><code>## Inference for Stan model: 03501badcdaacac034135e387812747c.
 ## 4 chains, each with iter=2000; warmup=1000; thin=1; 
@@ -1001,7 +1046,7 @@ quantile(sample$a, c(0.05, 0.95))</code></pre>
 ## b         0.90    0.03 0.77   0.22   0.48   0.72   1.07   2.73   496 1.01
 ## lp__    -26.50    0.04 1.11 -29.53 -26.91 -26.15 -25.72 -25.43   892 1.00
 ## 
-## Samples were drawn using NUTS(diag_e) at Wed Jul  1 08:42:13 2020.
+## Samples were drawn using NUTS(diag_e) at Wed Jul  1 08:54:44 2020.
 ## For each parameter, n_eff is a crude measure of effective sample size,
 ## and Rhat is the potential scale reduction factor on split chains (at 
 ## convergence, Rhat=1).</code></pre>
